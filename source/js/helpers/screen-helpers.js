@@ -2,6 +2,9 @@
 const ScreenId = {
   PRIZES: `prizes`,
   GAME: `game`,
+  RESULT_TRIP: `result`,
+  RESULT_PRIZE: `result2`,
+  RESULT_NEGATIVE: `result3`,
 };
 
 /** @enum {string} */
@@ -51,10 +54,20 @@ const getScreenIdByLocation = () => {
   return window.location.hash.substring(1);
 };
 
+const dispatchScreenEvent = (screenEventType, currentScreen, previousScreen) => {
+  document.body.dispatchEvent(new CustomEvent(screenEventType, {
+    detail: {
+      currentScreen,
+      previousScreen,
+    },
+  }));
+};
+
 export {
   ScreenId,
   ScreenState,
   ScreenEventType,
   setScreenState,
   getScreenIdByLocation,
+  dispatchScreenEvent,
 };

@@ -24,7 +24,7 @@ const prizes = [
       delay: 5700,
       frames: [1, 2, 3, 4, 5, 6, 7],
       fps: NUMBERS_ANIMATION_FPS,
-      onRenderFrame(number) {
+      onRenderFrame({frame: number}) {
         casesNumbersContainer.dataset.currentNumber = number;
       },
     }),
@@ -36,7 +36,7 @@ const prizes = [
       delay: 7900,
       frames: [11, 185, 371, 514, 821, 849, 900],
       fps: NUMBERS_ANIMATION_FPS,
-      onRenderFrame(number) {
+      onRenderFrame({frame: number}) {
         codesNumbersContainer.dataset.currentNumber = number;
       },
     }),

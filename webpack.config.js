@@ -19,6 +19,7 @@ module.exports = {
     alias: {
       helpers: resolve(__dirname, `source/js/helpers`),
       modules: resolve(__dirname, `source/js/modules`),
+      scenes: resolve(__dirname, `source/js/scenes`),
     },
   },
   mode: `development`,

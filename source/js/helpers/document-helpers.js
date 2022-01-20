@@ -61,6 +61,19 @@ const reloadSvg = (element) => {
   element.replaceWith(element.cloneNode(true));
 };
 
+/**
+ * @param {HTMLImageElement | string} imageOrSource
+ * @return {HTMLImageElement}
+ */
+const ensureImage = (imageOrSource) => {
+  if (imageOrSource instanceof HTMLImageElement) {
+    return imageOrSource;
+  }
+  const image = new Image();
+  image.src = imageOrSource;
+  return image;
+};
+
 export {
   scrollIntoViewIfNeeded,
   findAncestor,
@@ -69,4 +82,5 @@ export {
   sleep,
   addClassToken,
   reloadSvg,
+  ensureImage,
 };

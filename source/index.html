@@ -338,11 +338,44 @@
     <section class="screen screen--hidden screen--result" id="result">
       <div class="screen__wrapper">
         <div class="result result--trip">
-          <div class="result__image">
+          <div class="result__image" hidden>
             <picture>
               <source srcset="img/result1-mob.png 1x, img/result1-mob@2x.png 2x" media="(max-width: 768px) and (orientation: portrait)">
               <img src="img/result1.png" srcset="img/result1@2x.png 2x" alt="">
             </picture>
+          </div>
+          <canvas class="result__canvas"></canvas>
+          <div class="result__composite-image">
+            <div class="result__image-blob">
+              <img src="img/result-trip/back.png" alt="" width="586" height="324" hidden>
+            </div>
+            <div class="result__image-tree-1">
+              <img src="img/result-trip/tree.png" alt="" width="38" height="101" hidden>
+            </div>
+            <div class="result__image-tree-2">
+              <img src="img/result-trip/tree%202.png" alt="" width="50" height="159" hidden>
+            </div>
+            <div class="result__image-ice">
+              <img src="img/result-trip/ice.png" alt="" width="408" height="167" hidden>
+            </div>
+            <div class="result__image-animal">
+              <img src="img/result-trip/sea-calf-2.png" alt="" width="488" height="488" hidden>
+            </div>
+            <div class="result__image-plane">
+              <div class="image-inner">
+                <img src="img/result-trip/airplane.png" alt="" width="135" height="135" hidden>
+              </div>
+            </div>
+            <div class="result__image-snow-1">
+              <div class="image-inner">
+                <img src="img/result-trip/snowflake.png" alt="" width="220" height="220" hidden>
+              </div>
+            </div>
+            <div class="result__image-snow-2">
+              <div class="image-inner">
+                <img src="img/result-trip/snowflake.png" alt="" width="170" height="170" hidden>
+              </div>
+            </div>
           </div>
           <h2 class="result__title">
             <span class="visually-hidden">Победа!</span>

@@ -1,26 +1,44 @@
 import {reloadSvg} from 'helpers/document-helpers';
+import {ScreenEventType, dispatchScreenEvent, ScreenId} from 'helpers/screen-helpers';
+import seaCalfScene from 'scenes/sea-calf-scene/sea-calf-scene';
 
 export default () => {
+  const showResultButtons = Array.from(document.querySelectorAll(`.js-show-result`));
+  const playButton = document.querySelector(`.js-play`);
+  const messagesContainer = document.getElementById(`messages`);
+  const messageField = document.getElementById(`message-field`);
+
+  const results = Array.prototype.map.call(document.querySelectorAll(`.screen--result`), (element, index) => {
+    return {
+      index,
+      id: element.id,
+      element,
+      svg: element.querySelector(`.result__title svg`),
+    };
+  });
+
   const hideResult = (result) => {
-    result.classList.replace(`screen--show`, `screen--hidden`);
+    result.element.classList.replace(`screen--show`, `screen--hidden`);
   };
 
   const showResult = (result) => {
-    reloadSvg(result.querySelector(`.result__title svg`));
+    reloadSvg(result.element.querySelector(`.result__title svg`));
 
-    result.classList.remove(`screen--hidden`);
+    result.element.classList.remove(`screen--hidden`);
     requestAnimationFrame(() => {
-      result.classList.add(`screen--show`);
+      result.element.classList.add(`screen--show`);
     });
   };
 
   const initResults = () => {
     showResultButtons.forEach((button) => {
       button.addEventListener(`click`, () => {
-        results.forEach(hideResult);
+        const currentResult = results.find((result) => result.id === button.dataset.target);
 
-        const targetResult = results.find((result) => result.id === button.dataset.target);
-        showResult(targetResult);
+        results.forEach(hideResult);
+        showResult(currentResult);
+
+        dispatchScreenEvent(ScreenEventType.SCREEN_CHANGE, currentResult);
       });
     });
   };
@@ -33,12 +51,22 @@ export default () => {
     });
   };
 
-  const showResultButtons = Array.from(document.querySelectorAll(`.js-show-result`));
-  const results = Array.from(document.querySelectorAll(`.screen--result`));
-  const playButton = document.querySelector(`.js-play`);
-  const messagesContainer = document.getElementById(`messages`);
-  const messageField = document.getElementById(`message-field`);
+  const onScreenChange = (evt) => {
+    const {currentScreen} = evt.detail;
+
+    if (currentScreen.id === ScreenId.RESULT_TRIP) {
+      seaCalfScene.activate();
+    } else {
+      seaCalfScene.deactivate();
+    }
+  };
+
+  document.body.addEventListener(ScreenEventType.SCREEN_CHANGE, onScreenChange);
 
   initResults();
   initPlayButton();
+
+  setTimeout(() => {
+    showResultButtons[0].click();
+  });
 };

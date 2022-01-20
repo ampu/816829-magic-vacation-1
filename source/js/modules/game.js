@@ -12,7 +12,7 @@ const NUMBER_FORMAT = {
 };
 
 const formatNumber = (value) => {
-  return `${value}`.padStart(NUMBER_FORMAT.length, NUMBER_FORMAT.fillString);
+  return String(value).padStart(NUMBER_FORMAT.length, NUMBER_FORMAT.fillString);
 };
 
 export default () => {
@@ -23,7 +23,7 @@ export default () => {
   const counterAnimation = new FrameAnimation({
     duration: COUNTER_SECONDS * MILLISECONDS_IN_SECOND,
     fps: COUNTER_ANIMATION_FPS,
-    onRenderFrame(elapsedSeconds) {
+    onRenderFrame({frameId: elapsedSeconds}) {
       const remainingSeconds = COUNTER_SECONDS - elapsedSeconds;
 
       const minutes = Math.floor(remainingSeconds / SECONDS_IN_MINUTE);

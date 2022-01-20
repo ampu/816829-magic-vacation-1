@@ -181,16 +181,6 @@
   }
 }
 
-.lose-heading-letter:nth-of-type(1) {
-  stroke-dasharray: 431.28;
-  stroke-dashoffset: 431.28;
-  transition: stroke-dashoffset 5s linear;
-
-  .screen--show & {
-    stroke-dashoffset: 0;
-  }
-}
-
 .win-heading {
   will-change: transform;
 
