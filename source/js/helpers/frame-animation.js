@@ -1,12 +1,13 @@
 import {MILLISECONDS_IN_SECOND} from './time-helpers';
 import {easeLinear} from './easings';
 
+const PLAYBACK_RATE = 1;
 const MAX_PROGRESS = 1;
 const MAX_PROGRESS_WITH_ALTERNATION = 2 * MAX_PROGRESS;
 const TIME_ORIGIN = Date.now() - Math.trunc(performance.now());
 
 const calculateElapsed = (currentTimestamp, startTimestamp, delay) => {
-  return currentTimestamp - (startTimestamp + delay);
+  return (currentTimestamp - (startTimestamp + delay)) * PLAYBACK_RATE;
 };
 
 const calculateProgress = (elapsed, duration, shouldAlternate) => {
@@ -54,7 +55,7 @@ export class FrameAnimation {
     this._shouldPreloadFirstFrame = shouldPreloadFirstFrame;
     this._shouldAlternate = shouldAlternate;
 
-    this._delay = delay;
+    this._delay = delay / PLAYBACK_RATE;
     this._fps = fps;
     this._frames = frames;
     this._onProgress = onProgress;

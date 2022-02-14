@@ -4,25 +4,21 @@ import {FrameAnimation} from 'helpers/frame-animation';
 
 export default new SceneObject({
   images: [
-    document.querySelector(`.result__image-tree2`),
+    document.querySelector(`.result__image-negative-lock`),
   ],
   state: new SceneObjectState({
     opacity: 0,
-    width: 56,
-    translateX: 114,
-    translateY: 153,
-    centerX: 0.5,
-    centerY: 1,
-    scaleX: 1,
-    scaleY: 1,
+    width: 178,
+    y: 60,
+    scaleX: 0.8,
+    scaleY: 0.8,
   }),
   animation: new FrameAnimation({
-    delay: 700, // 1:12.5
-    duration: 300,
+    delay: 150, // 0:53.65
+    duration: 200,
     onRenderFrame({progress}, {state}) {
       state.opacity = progress;
-      state.scaleX = progress;
-      state.scaleY = progress;
+      state.scaleX = state.scaleY = 0.8 + progress * 0.2;
     },
   }),
   /**

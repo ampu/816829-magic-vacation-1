@@ -62,12 +62,17 @@ export const createCalculator = ({
 export const createCompositeCalculator = (ranges) => {
   let compositeMinX = +Infinity;
   let compositeMaxX = -Infinity;
-  ranges.forEach(({xRange: [minX, maxX]}, i) => {
+  ranges.forEach(({xRange: [minX, maxX], yRange}, i) => {
     if (!(minX <= maxX)) {
       throw new Error(`createCompositeCalculator(): minX (${minX}) shall not be more than maxX (${maxX}) in #${i + 1}/${ranges.length}`);
     }
+
     compositeMinX = min(compositeMinX, minX);
     compositeMaxX = max(compositeMaxX, maxX);
+
+    if (yRange.length === 1) {
+      yRange.push(yRange[0]);
+    }
   });
 
   return (x) => {
@@ -110,16 +115,5 @@ export const createSinusCalculator = ({x, y, width, height, amplitude}) => {
   return {
     calculateY: (progress) => height / 2 * sin(ratio * (width * progress + x)) + y,
     calculateTangent: (progress) => height / 2 * ratio * cos(ratio * (width * progress + x)),
-  };
-};
-
-/**
- * @param {number} ratio
- * @return {function(CalculatorRange): CalculatorRange} Slows down animation in debugging purpuses
- */
-export const createRangeSlowdown = (ratio) => {
-  return (range) => {
-    range.xRange = range.xRange.map((x) => x * ratio);
-    return range;
   };
 };

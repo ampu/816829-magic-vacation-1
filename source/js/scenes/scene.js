@@ -47,6 +47,10 @@ export class Scene {
     this._onWindowResize = this._onWindowResize.bind(this);
   }
 
+  getImages() {
+    return this._imagesCompleteListener.getImages();
+  }
+
   activate() {
     this._imagesCompleteListener.activate();
   }
@@ -87,17 +91,21 @@ export class Scene {
       this._context.fillRect(0, 0, this._width, this._height);
     }
 
-    const size = Math.min(this._width, this._height);
-    const zoom = size / 2 / this._zoom;
+    const minSize = Math.min(this._width, this._height);
+    const zoom = minSize / 2 / this._zoom;
     const centerX = this._width / 2;
     const centerY = this._height / 2;
+    const zoomedSize = {
+      width: centerX / zoom,
+      height: centerY / zoom,
+    };
     this._context.setTransform(zoom, 0, 0, zoom, centerX, centerY);
 
     this._renderAxesIfNeeded();
 
     for (const object of this._objects) {
       if (object.state.shouldRender()) {
-        object.onRenderObject(this._context, object.state, object.images);
+        object.onRenderObject(this._context, object.state, object.images, zoomedSize);
       }
     }
   }

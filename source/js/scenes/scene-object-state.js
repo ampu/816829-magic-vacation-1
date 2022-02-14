@@ -1,4 +1,4 @@
-import flattenDeep from 'lodash/flatten';
+import flatten from 'lodash/flatten';
 
 import {convertDegreesToRadians, calculateTangentY1} from 'helpers/calculator';
 
@@ -42,7 +42,7 @@ export const renderTangent = (context, [x1, x2, dx], fx, dfx) => {
 
 export const renderBezier = (context, bezier, zoom = 20) => {
   context.beginPath();
-  for (let i = 0; i <= 2 * zoom; i++) {
+  for (let i = 0; i <= zoom; i++) {
     const t = i / zoom;
     const x = bezier.calculateX(t);
     const y = bezier.calculateY(t);
@@ -58,7 +58,7 @@ export const renderBezier = (context, bezier, zoom = 20) => {
 export const renderNativeBezier = (context, points) => {
   context.beginPath();
   context.moveTo(...points[0]);
-  context.bezierCurveTo(...flattenDeep(points.slice(1)));
+  context.bezierCurveTo(...flatten(points.slice(1)));
   context.stroke();
 };
 

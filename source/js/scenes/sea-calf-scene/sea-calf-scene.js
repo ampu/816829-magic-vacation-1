@@ -1,4 +1,5 @@
 import {Scene} from 'scenes/scene';
+import {CompositeScene} from 'scenes/composite-scene';
 
 import blob from './blob';
 import animalOnIce from './animal-on-ice';
@@ -8,15 +9,13 @@ import snow1 from './snow1';
 import snow2 from './snow2';
 import plane from './plane';
 
-const ZOOM = 400;
-
 const container = document.querySelector(`.result--trip`);
 
 const foreground = new Scene({
-  name: `foreground`,
+  name: `sea-calf.foreground`,
   container,
   canvas: document.querySelector(`.result--trip .result__canvas--foreground`),
-  zoom: ZOOM,
+  zoom: 400,
   animationProps: {
     duration: 3000,
   },
@@ -30,10 +29,10 @@ const foreground = new Scene({
 });
 
 const background = new Scene({
-  name: `background`,
+  name: `sea-calf.background`,
   container,
   canvas: document.querySelector(`.result--trip .result__canvas--background`),
-  zoom: ZOOM,
+  zoom: 400,
   animationProps: {
     duration: Infinity,
   },
@@ -43,13 +42,4 @@ const background = new Scene({
   ],
 });
 
-export default {
-  activate() {
-    foreground.activate();
-    background.activate();
-  },
-  deactivate() {
-    foreground.deactivate();
-    background.deactivate();
-  },
-};
+export default new CompositeScene([foreground, background]);

@@ -409,12 +409,18 @@
     <section class="screen screen--hidden screen--result" id="result3">
       <div class="screen__wrapper">
         <div class="result result--negative">
-          <div class="result__image">
-            <picture>
-              <source srcset="img/result3-mob.png 1x, img/result3-mob@2x.png 2x" media="(max-width: 768px) and (orientation: portrait)">
-              <img src="img/result3.png" srcset="img/result3@2x.png 2x" alt="">
-            </picture>
-          </div>
+          <img class="result__image-negative-lock" src="./img/result-negative/key.png" width="171" height="292" hidden>
+          <img class="result__image-negative-leaf" src="./img/result-negative/leaf.png" width="150" height="150" hidden>
+          <img class="result__image-negative-snowflake" src="./img/result-negative/snowflake.png" width="150" height="150" hidden>
+          <img class="result__image-negative-saturn" src="./img/result-negative/saturn.png" width="150" height="150" hidden>
+          <img class="result__image-negative-watermelon" src="./img/result-negative/watermelon.png" width="150" height="150" hidden>
+          <img class="result__image-negative-flamingo" src="./img/result-negative/flamingo.png" width="150" height="150" hidden>
+          <img class="result__image-negative-crocodile" src="./img/result-negative/crocodile.png" width="150" height="150" hidden>
+          <img class="result__image-negative-drop" src="./img/result-negative/drop.png" width="39" height="59" hidden>
+
+          <canvas class="result__canvas result__canvas--foreground"></canvas>
+          <canvas class="result__canvas result__canvas--background"></canvas>
+
           <h2 class="result__title">
             <span class="visually-hidden">Не угадал!</span>
             <include src="./img/lose-heading.svg"></include>
