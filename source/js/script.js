@@ -10,6 +10,7 @@ import result from 'modules/result.js';
 import form from 'modules/form.js';
 import social from 'modules/social.js';
 import game from 'modules/game';
+import sonya from 'modules/sonya';
 import fullPageScroll from 'modules/full-page-scroll';
 
 // init modules
@@ -24,4 +25,5 @@ result();
 form();
 social();
 game();
+sonya();
 fullPageScroll();

@@ -1,4 +1,4 @@
-import {ScreenEventType, ScreenId} from 'helpers/screen-helpers';
+import {addScreenListener, ScreenId, ScreenState} from 'helpers/screen-helpers';
 import {MILLISECONDS_IN_SECOND, SECONDS_IN_MINUTE} from 'helpers/time-helpers';
 import {FrameAnimation} from 'helpers/frame-animation';
 import {StateStorage} from 'helpers/state-storage';
@@ -33,17 +33,12 @@ export default () => {
     },
   });
 
-  const onScreenChange = (evt) => {
-    const {currentScreen} = evt.detail;
-    if (currentScreen.id === ScreenId.GAME) {
-      if (!counterAnimation.hasStarted()) {
-        counterAnimation.start();
-        storage.setState(counterAnimation.getStartTimestamp());
-      }
+  addScreenListener([ScreenId.GAME], (screen) => {
+    if (screen.state === ScreenState.ACTIVE && !counterAnimation.hasStarted()) {
+      counterAnimation.start();
+      storage.setState(counterAnimation.getStartTimestamp());
     }
-  };
-
-  document.body.addEventListener(ScreenEventType.SCREEN_CHANGE, onScreenChange);
+  });
 
   const startTimestamp = storage.getState(0);
   if (startTimestamp > 0) {

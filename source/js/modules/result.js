@@ -1,5 +1,5 @@
 import {reloadSvg} from 'helpers/document-helpers';
-import {ScreenEventType, dispatchScreenEvent, ScreenId} from 'helpers/screen-helpers';
+import {ScreenEventType, dispatchScreenEvent, ScreenId, addScreenListener, ScreenState} from 'helpers/screen-helpers';
 import seaCalfScene from 'scenes/sea-calf-scene/sea-calf-scene';
 import crocodileScene from 'scenes/crocodile-scene/crocodile-scene';
 
@@ -56,31 +56,25 @@ export default () => {
     });
   };
 
-  const onScreenChange = (evt) => {
-    const {currentScreen} = evt.detail;
-
+  addScreenListener([ScreenId.RESULT_TRIP, ScreenId.RESULT_NEGATIVE], (screen) => {
     if (state.activeScene) {
       state.activeScene.deactivate();
       state.activeScene = null;
     }
 
-    if (currentScreen.id === ScreenId.RESULT_TRIP) {
-      state.activeScene = seaCalfScene;
-    } else if (currentScreen.id === ScreenId.RESULT_NEGATIVE) {
-      state.activeScene = crocodileScene;
+    if (screen.state === ScreenState.ACTIVE) {
+      if (screen.id === ScreenId.RESULT_TRIP) {
+        state.activeScene = seaCalfScene;
+      } else if (screen.id === ScreenId.RESULT_NEGATIVE) {
+        state.activeScene = crocodileScene;
+      }
     }
 
     if (state.activeScene) {
       state.activeScene.activate();
     }
-  };
-
-  document.body.addEventListener(ScreenEventType.SCREEN_CHANGE, onScreenChange);
+  });
 
   initResults();
   initPlayButton();
-
-  setTimeout(() => {
-    showResultButtons[2].click();
-  });
 };

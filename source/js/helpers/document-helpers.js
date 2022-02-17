@@ -1,5 +1,6 @@
 const Viewport = {
   TABLET: 768,
+  STOP_SCALING: 2000,
 };
 
 /**
@@ -44,6 +45,10 @@ const isMobileOrPortrait = () => {
   return window.innerWidth < Viewport.TABLET || isPortrait();
 };
 
+const isStopScaling = () => {
+  return window.innerWidth >= Viewport.STOP_SCALING;
+};
+
 const sleep = (timeout) => {
   return new Promise((resolve) => {
     setTimeout(resolve, timeout);
@@ -79,6 +84,7 @@ export {
   findAncestor,
   isPortrait,
   isMobileOrPortrait,
+  isStopScaling,
   sleep,
   addClassToken,
   reloadSvg,

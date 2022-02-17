@@ -22,6 +22,7 @@ class FullPageScroll {
 
     this.screens = Array.prototype.map.call(document.querySelectorAll(`.screen:not(.screen--result)`), (element, index) => {
       return {
+        state: ScreenState.HIDDEN,
         index,
         id: element.id,
         element,

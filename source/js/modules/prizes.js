@@ -1,5 +1,5 @@
-import {addClassToken, isPortrait as calculateIsPortrait} from 'helpers/document-helpers';
-import {ScreenId, ScreenEventType} from 'helpers/screen-helpers';
+import {addClassToken, isPortrait as calculatePortrait} from 'helpers/document-helpers';
+import {ScreenId, addScreenListener, ScreenState} from 'helpers/screen-helpers';
 import {FrameAnimation} from 'helpers/frame-animation';
 
 const NUMBERS_ANIMATION_FPS = 12;
@@ -69,7 +69,7 @@ export default () => {
   };
 
   const isPortraitChanged = () => {
-    const isPortrait = calculateIsPortrait();
+    const isPortrait = calculatePortrait();
     if (state.isPortrait === isPortrait) {
       return false;
     }
@@ -99,27 +99,15 @@ export default () => {
     }
   };
 
-  const onScreenChange = (evt) => {
-    const {currentScreen} = evt.detail;
-
-    if (currentScreen.id === ScreenId.PRIZES) {
+  addScreenListener([ScreenId.PRIZES], (screen) => {
+    if (screen.state === ScreenState.ACTIVE) {
       if (isPortraitChanged()) {
         renderIcons();
         activateNumbersAnimationsIfNeeded();
       }
-
       window.addEventListener(`resize`, onWindowResize);
-    }
-  };
-
-  const onPreviousScreenHidden = (evt) => {
-    const {previousScreen} = evt.detail;
-
-    if (previousScreen && previousScreen.id === ScreenId.PRIZES) {
+    } else {
       window.removeEventListener(`resize`, onWindowResize);
     }
-  };
-
-  document.body.addEventListener(ScreenEventType.SCREEN_CHANGE, onScreenChange);
-  document.body.addEventListener(ScreenEventType.PREVIOUS_SCREEN_HIDDEN, onPreviousScreenHidden);
+  });
 };
