@@ -1,12 +1,9 @@
 import {FrameAnimation} from 'helpers/frame-animation';
 import {ImagesCompleteListener} from 'helpers/images-complete-listener';
 
-const RETINA_RATIO = 2;
-
 export class Scene {
   /**
    * @param {string} name
-   * @param {HTMLElement} container
    * @param {HTMLCanvasElement} canvas
    * @param {number} zoom
    * @param {boolean} shouldRenderAxes
@@ -15,7 +12,6 @@ export class Scene {
    */
   constructor({
     name = performance.now(),
-    container,
     canvas,
     zoom = 1,
     shouldRenderAxes = false,
@@ -25,7 +21,6 @@ export class Scene {
     this._name = name;
     this._zoom = zoom;
     this._shouldRenderAxes = shouldRenderAxes;
-    this._container = container;
     this._canvas = canvas;
     this._context = canvas.getContext(`2d`);
     this._width = 0;
@@ -132,8 +127,8 @@ export class Scene {
   }
 
   _resize() {
-    this._canvas.width = this._width = this._container.clientWidth * RETINA_RATIO;
-    this._canvas.height = this._height = this._container.clientHeight * RETINA_RATIO;
+    this._canvas.width = this._width = this._canvas.clientWidth * window.devicePixelRatio;
+    this._canvas.height = this._height = this._canvas.clientHeight * window.devicePixelRatio;
   }
 
   _onWindowResize() {

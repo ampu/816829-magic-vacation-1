@@ -5,90 +5,120 @@ const WriteFilePlugin = require('write-file-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const {resolve, join, sep} = require('path');
 
+const SASS_RULE = {
+  test: /\.s[a|c]ss$/,
+  use: [
+    {
+      loader: MiniCssExtractPlugin.loader,
+    },
+    {
+      loader: `css-loader`,
+      options: {
+        sourceMap: true,
+        url: false,
+      },
+    },
+    {
+      loader: `sass-loader`,
+      options: {sourceMap: true},
+    },
+  ],
+};
+
+const CSS_RULE = {
+  test: /\.css$/,
+  use: [
+    {
+      loader: MiniCssExtractPlugin.loader,
+    },
+    {
+      loader: `css-loader`,
+      options: {
+        sourceMap: true,
+        url: false,
+      },
+    },
+  ],
+};
+
+const HTML_RULE = {
+  test: /\.html$/,
+  use: [
+    {
+      loader: `html-loader`,
+      options: {
+        attributes: false,
+      },
+    },
+    {
+      loader: `posthtml-loader`,
+      options: {
+        plugins: [
+          require(`posthtml-include`)({root: `source`}),
+        ],
+      },
+    },
+  ],
+};
+
+const GLSL_RULE = {
+  test: /\.glsl$/,
+  use: [
+    {
+      loader: `webpack-glsl-minify`,
+      options: {
+        output: `source`,
+        esModule: false,
+        stripVersion: false,
+        preserveDefines: true,
+        preserveUniforms: true,
+        preserveVariables: true,
+        preserveAll: true,
+        disableMangle: true,
+        nomangle: [],
+        includesOnly: true,
+      },
+    },
+  ],
+};
+
 module.exports = {
   entry: {
     scripts: [
       `./source/js/script.js`,
       `./source/scss/style.scss`,
-      `./source/index.html`
-    ]
+      `./source/index.html`,
+    ],
   },
   resolve: {
-    extensions: [`.js`, `.sass`, `.scss`, `.css`],
+    extensions: [`.js`, `.sass`, `.scss`, `.css`, `.glsl`],
     modules: [`source`, `./node_modules/`],
     alias: {
       helpers: resolve(__dirname, `source/js/helpers`),
       modules: resolve(__dirname, `source/js/modules`),
       scenes: resolve(__dirname, `source/js/scenes`),
+      [`3d`]: resolve(__dirname, `source/js/3d`),
+      glsl: resolve(__dirname, `source/glsl`),
     },
   },
   mode: `development`,
   devtool: `source-map`,
   devServer: {
     contentBase: join(__dirname, `build`),
-    port: 7777
+    port: 7777,
   },
   output: {
     path: join(__dirname, `build`),
     publicPath: ``,
-    filename: `js/script.js`
+    filename: `js/script.js`,
   },
   module: {
     rules: [
-      {
-        test: /\.s[a|c]ss$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-          },
-          {
-            loader: `css-loader`,
-            options: {
-              sourceMap: true,
-              url: false
-            },
-          },
-          {
-            loader: `sass-loader`,
-            options: { sourceMap: true },
-          }
-        ],
-      },
-      {
-        test: /\.css$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-          },
-          {
-            loader: `css-loader`,
-            options: {
-              sourceMap: true,
-              url: false
-            },
-          },
-        ],
-      },
-      {
-        test: /\.html$/,
-        use: [
-          {
-            loader: `html-loader`,
-            options: {
-              attributes: false
-            }
-          },
-          {
-            loader: `posthtml-loader`,
-            options: {
-              plugins: [
-                require(`posthtml-include`)({ root: `source` })
-              ]
-            }
-          }
-        ]
-      }
-    ]
+      SASS_RULE,
+      CSS_RULE,
+      HTML_RULE,
+      GLSL_RULE,
+    ],
   },
   plugins: [
     new WriteFilePlugin(),
@@ -98,10 +128,10 @@ module.exports = {
     }),
     new MiniCssExtractPlugin({
       filename: `css/style.min.css`,
-      chunkFilename: `[id].css`
+      chunkFilename: `[id].css`,
     }),
     new CssoWebpackPlugin({
-      pluginOutputPostfix: `min`
+      pluginOutputPostfix: `min`,
     }),
     new CopyPlugin([
       {
@@ -127,7 +157,7 @@ module.exports = {
         transformPath(targetPath) {
           return targetPath.replace(`source${sep}`, ``);
         },
-      }
+      },
     ]),
-  ]
+  ],
 };

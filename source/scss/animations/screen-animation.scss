@@ -10,26 +10,6 @@
   }
 }
 
-.screen--intro {
-  background-color: $c-dark;
-  background-image: url("../../img/scene.png");
-  background-repeat: no-repeat;
-  background-size: 100% auto;
-  background-position: center;
-
-  @include retina {
-    background-image: url("../../img/scene@2x.png");
-  }
-
-  @media (orientation: portrait) {
-    background-image: url("../../img/scene-mob.png");
-
-    @include retina {
-      background-image: url("../../img/scene-mob@2x.png");
-    }
-  }
-}
-
 .screen--prizes {
   position: relative;
   background-color: transparent;

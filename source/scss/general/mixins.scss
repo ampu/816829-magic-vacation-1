@@ -106,3 +106,47 @@
     }
   }
 }
+
+@mixin animation-screen {
+  background-color: $c-dark;
+  background-image: url("../../img/scene.png");
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+  background-position: center;
+
+  @include retina {
+    background-image: url("../../img/scene@2x.png");
+  }
+
+  @media (orientation: portrait) {
+    background-image: url("../../img/scene-mob.png");
+
+    @include retina {
+      background-image: url("../../img/scene-mob@2x.png");
+    }
+  }
+}
+
+@mixin cover($width, $height, $boxWidth: 100vw, $boxHeight: 100vh) {
+  $aspect: $width / $height;
+
+  width: $boxWidth;
+  height: $boxWidth / $aspect;
+
+  @media (min-aspect-ratio: #{$width} / #{$height}) {
+    width: $boxHeight * $aspect;
+    height: $boxHeight;
+  }
+}
+
+@mixin contain($width, $height, $boxWidth: 100vw, $boxHeight: 100vh) {
+  $aspect: $width / $height;
+
+  width: $boxWidth;
+  height: $boxWidth / $aspect;
+
+  @media (max-aspect-ratio: #{$width} / #{$height}) {
+    width: $boxHeight * $aspect;
+    height: $boxHeight;
+  }
+}

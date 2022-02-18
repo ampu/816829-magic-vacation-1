@@ -9,11 +9,8 @@ import snow1 from './snow1';
 import snow2 from './snow2';
 import plane from './plane';
 
-const container = document.querySelector(`.result--trip`);
-
 const foreground = new Scene({
   name: `sea-calf.foreground`,
-  container,
   canvas: document.querySelector(`.result--trip .result__canvas--foreground`),
   zoom: 400,
   animationProps: {
@@ -30,7 +27,6 @@ const foreground = new Scene({
 
 const background = new Scene({
   name: `sea-calf.background`,
-  container,
   canvas: document.querySelector(`.result--trip .result__canvas--background`),
   zoom: 400,
   animationProps: {

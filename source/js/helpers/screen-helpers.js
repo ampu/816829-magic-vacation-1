@@ -1,7 +1,9 @@
 /** @enum {string} */
 const ScreenId = {
+  INTRO: `top`,
   PRIZES: `prizes`,
   GAME: `game`,
+  STORY: `story`,
   RESULT_TRIP: `result`,
   RESULT_PRIZE: `result2`,
   RESULT_NEGATIVE: `result3`,

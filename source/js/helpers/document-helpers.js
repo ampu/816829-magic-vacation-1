@@ -79,6 +79,32 @@ const ensureImage = (imageOrSource) => {
   return image;
 };
 
+const coverSize = ([width, height], [boxWidth, boxHeight]) => {
+  const aspect = width / height;
+  return boxWidth / boxHeight < aspect
+    ? [
+      boxWidth,
+      boxWidth / aspect,
+    ]
+    : [
+      boxHeight * aspect,
+      boxHeight,
+    ];
+};
+
+const containSize = ([width, height], [boxWidth, boxHeight]) => {
+  const aspect = width / height;
+  return boxWidth / boxHeight > aspect
+    ? [
+      boxWidth,
+      boxWidth / aspect,
+    ]
+    : [
+      boxHeight * aspect,
+      boxHeight,
+    ];
+};
+
 export {
   scrollIntoViewIfNeeded,
   findAncestor,
@@ -89,4 +115,6 @@ export {
   addClassToken,
   reloadSvg,
   ensureImage,
+  coverSize,
+  containSize,
 };

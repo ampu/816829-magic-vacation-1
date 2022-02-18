@@ -1,5 +1,5 @@
 import {reloadSvg} from 'helpers/document-helpers';
-import {ScreenEventType, dispatchScreenEvent, ScreenId, addScreenListener, ScreenState} from 'helpers/screen-helpers';
+import {ScreenEventType, dispatchScreenEvent, ScreenId, addScreenListener} from 'helpers/screen-helpers';
 import seaCalfScene from 'scenes/sea-calf-scene/sea-calf-scene';
 import crocodileScene from 'scenes/crocodile-scene/crocodile-scene';
 
@@ -62,12 +62,10 @@ export default () => {
       state.activeScene = null;
     }
 
-    if (screen.state === ScreenState.ACTIVE) {
-      if (screen.id === ScreenId.RESULT_TRIP) {
-        state.activeScene = seaCalfScene;
-      } else if (screen.id === ScreenId.RESULT_NEGATIVE) {
-        state.activeScene = crocodileScene;
-      }
+    if (screen.id === ScreenId.RESULT_TRIP) {
+      state.activeScene = seaCalfScene;
+    } else if (screen.id === ScreenId.RESULT_NEGATIVE) {
+      state.activeScene = crocodileScene;
     }
 
     if (state.activeScene) {

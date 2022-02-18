@@ -74,27 +74,17 @@
   align-items: center;
   z-index: -1;
 
-  @mixin composite-image-cover($width, $height) {
-    width: 100vw;
-    height: calc(100vw * #{$height / $width});
-
-    @media (max-aspect-ratio: #{$width} / #{$height}) {
-      width: calc(100vh * #{$width / $height});
-      height: 100vh;
-    }
-  }
-
   $composite-image-width: 1440;
   $composite-image-height: 760;
   $composite-image-width-mobile-portrait: 320;
   $composite-image-height-mobile-portrait: 530;
 
   @include not-mobile-portrait {
-    @include composite-image-cover($composite-image-width, $composite-image-height);
+    @include cover($composite-image-width, $composite-image-height);
   }
 
   @include mobile-portrait {
-    @include composite-image-cover($composite-image-width-mobile-portrait, $composite-image-height-mobile-portrait);
+    @include cover($composite-image-width-mobile-portrait, $composite-image-height-mobile-portrait);
   }
 
   @function composite-image-rubber($size) {
