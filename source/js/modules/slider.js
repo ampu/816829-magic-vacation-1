@@ -13,24 +13,28 @@ export const SLIDES = [
     gradient: `linear-gradient(180deg, rgba(83, 65, 118, 0) 0%, #523e75 16.85%)`,
     themeColor: `#a67ee5`,
     textureUrl: `./img/scenes-textures/scene-1.png`,
+    textureHueRotation: 0,
   },
   {
     image: `url("img/slide2.jpg")`,
     gradient: `linear-gradient(180deg, rgba(45, 54, 179, 0) 0%, #2a34b0 16.85%)`,
     themeColor: `#5468ff`,
     textureUrl: `./img/scenes-textures/scene-2.png`,
+    textureHueRotation: -20,
   },
   {
     image: `url("img/slide3.jpg")`,
     gradient: `linear-gradient(180deg, rgba(92, 138, 198, 0) 0%, #5183c4 16.85%)`,
     themeColor: `#a2ffff`,
     textureUrl: `./img/scenes-textures/scene-3.png`,
+    textureHueRotation: 0,
   },
   {
     image: `url("img/slide4.jpg")`,
     gradient: `linear-gradient(180deg, rgba(45, 39, 63, 0) 0%, #2f2a42 16.85%)`,
     themeColor: `#5e5484`,
     textureUrl: `./img/scenes-textures/scene-4.png`,
+    textureHueRotation: 0,
   },
 ];
 

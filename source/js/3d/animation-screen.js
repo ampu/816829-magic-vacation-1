@@ -2,10 +2,11 @@ import * as THREE from 'three';
 
 import {containSize} from 'helpers/document-helpers';
 import {ScreenId, ScreenState, addScreenListener} from 'helpers/screen-helpers';
-import TextureMaterial from './texture-material';
+import HueRotationTextureMaterial from './materials/hue-rotation-texture-material';
 import {SLIDES, addSlideChangeListener} from 'modules/slider';
 
 const INTRO_TEXTURE_URL = `./img/scenes-textures/scene-0.png`;
+const INTRO_TEXTURE_HUE_ROTATION = 0;
 const INTRO_THEME_COLOR = `#5f458c`;
 
 const PLANE_SIZE = [2048, 1024];
@@ -25,6 +26,7 @@ const initScene = ({
     canvas,
     alpha: true,
   });
+
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(width, height);
   renderer.setClearColor(new THREE.Color(clearColor));
@@ -53,17 +55,17 @@ const resizeScene = ({
   renderer.render(scene, camera);
 };
 
-const createTexturePlane = (textureUrl) => {
+const createTexturePlane = (textureUrl, textureHueRotation) => {
   const geometry = new THREE.PlaneBufferGeometry(...PLANE_SIZE);
   const texture = new THREE.TextureLoader().load(textureUrl);
-  const material = new TextureMaterial(texture);
+  const material = new HueRotationTextureMaterial(texture, textureHueRotation);
   return new THREE.Mesh(geometry, material);
 };
 
 export default () => {
   const animationScreen = document.querySelector(`.animation-screen`);
-  const introTexturePlane = createTexturePlane(INTRO_TEXTURE_URL);
-  const slideTexturePlanes = SLIDES.map(({textureUrl}) => createTexturePlane(textureUrl));
+  const introTexturePlane = createTexturePlane(INTRO_TEXTURE_URL, INTRO_TEXTURE_HUE_ROTATION);
+  const slideTexturePlanes = SLIDES.map(({textureUrl, textureHueRotation}) => createTexturePlane(textureUrl, textureHueRotation));
 
   const {renderer, scene, camera} = initScene({
     canvas: animationScreen.querySelector(`canvas`),
