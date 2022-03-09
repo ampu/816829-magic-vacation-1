@@ -16,6 +16,7 @@ export const SLIDES = [
     textureHueRotation: 0,
   },
   {
+    isCustom: true,
     image: `url("img/slide2.jpg")`,
     gradient: `linear-gradient(180deg, rgba(45, 54, 179, 0) 0%, #2a34b0 16.85%)`,
     themeColor: `#5468ff`,
@@ -88,15 +89,9 @@ const SwiperProps = {
 export default () => {
   let storySlider = null;
 
-  const renderSlide = ({themeColor}) => {
-    document.documentElement.style.setProperty(`--theme-color`, themeColor);
-  };
-
   const handlers = {
     slideChange: () => {
-      const slide = SLIDES[Math.floor(storySlider.activeIndex / 2)];
-      renderSlide(slide);
-      dispatchSlideChangeEvent(slide);
+      renderSlide(SLIDES[Math.floor(storySlider.activeIndex / 2)]);
     },
     resize: () => {
       storySlider.update();
@@ -124,8 +119,17 @@ export default () => {
     }
   };
 
+  const renderSlide = (slide) => {
+    document.documentElement.style.setProperty(`--theme-color`, slide.themeColor);
+    dispatchSlideChangeEvent(slide);
+  };
+
   renderSlide(SLIDES[0]);
 
   window.addEventListener(`resize`, renderSlider);
   renderSlider();
+
+  setTimeout(() => {
+    storySlider.slideNext();
+  });
 };

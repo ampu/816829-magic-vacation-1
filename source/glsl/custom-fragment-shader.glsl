@@ -1,9 +1,11 @@
 precision mediump float;
 
 uniform sampler2D map;
+uniform vec2 aspect;
+uniform float hueRotation;
+uniform vec3 bubbles[3];
 
 varying vec2 vUv;
-varying float vAmount;
 
 vec4 convertRgbToHsl(vec4 rgba) {
   float r = rgba.r;
@@ -88,5 +90,28 @@ vec4 rotateHue(vec4 rgba, float angle) {
 void main() {
   vec4 texel = texture2D(map, vUv);
 
-  gl_FragColor = rotateHue(texel, vAmount);
+  for (int i = 0; i < 3; i++) {
+    vec2 center = bubbles[i].xy;
+    float R = bubbles[i].z;
+    float h = R / 2.0;
+    vec2 direction = (center - vUv) * aspect;
+    float r = length(direction);
+
+    if (abs(R - r) <= 0.001) {
+      texel = vec4(1.0);
+      break;
+    }
+
+    if (r <= R) {
+      float hr = R * sqrt(1.0 - pow((R - h) / R, 2.0));
+      vec2 new_xy = r < hr
+        ? direction * (R - h) / sqrt(R * R - r * r)
+        : direction;
+
+      texel = texture2D(map, new_xy / aspect + center);
+      break;
+    }
+  }
+
+  gl_FragColor = rotateHue(texel, hueRotation);
 }
