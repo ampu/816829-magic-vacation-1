@@ -11,6 +11,7 @@ export default class CustomMaterial extends THREE.RawShaderMaterial {
     bubbles,
   }) {
     super({
+      transparent: true,
       uniforms: {
         map: {
           value: map,

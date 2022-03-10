@@ -1,11 +1,19 @@
 precision mediump float;
 
+#define PI 3.1415926535897932384626433832795
+
 uniform sampler2D map;
 uniform vec2 aspect;
 uniform float hueRotation;
 uniform vec3 bubbles[3];
 
 varying vec2 vUv;
+
+const float BORDER_WIDTH = 0.0025;
+const vec4 BORDER_TEXEL = vec4(1.0, 1.0, 1.0, 0.15);
+
+const float GLARE_OFFSET_RATIO = 0.85;
+const vec2 GLARE_ANGLE = vec2(PI * 0.65, PI * 0.85);
 
 vec4 convertRgbToHsl(vec4 rgba) {
   float r = rgba.r;
@@ -94,11 +102,18 @@ void main() {
     vec2 center = bubbles[i].xy;
     float R = bubbles[i].z;
     float h = R / 2.0;
-    vec2 direction = (center - vUv) * aspect;
+    vec2 direction = (vUv - center) * aspect;
     float r = length(direction);
+    float alpha = atan(direction.y, direction.x);
 
-    if (abs(R - r) <= 0.001) {
-      texel = vec4(1.0);
+    bool isBorder = abs(R - r) <= BORDER_WIDTH;
+
+    bool isGlare = abs(R * GLARE_OFFSET_RATIO - r) <= BORDER_WIDTH
+      && GLARE_ANGLE.x <= alpha
+      && alpha <= GLARE_ANGLE.y;
+
+    if (isBorder || isGlare) {
+      texel = mix(texel, BORDER_TEXEL, BORDER_TEXEL.a);
       break;
     }
 
