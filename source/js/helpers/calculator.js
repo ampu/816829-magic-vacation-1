@@ -55,6 +55,16 @@ export const createCalculator = ({
   };
 };
 
+export class NamedCalculator {
+  constructor(name = ``, {xRange, yRange, onProgress}) {
+    this.name = name;
+    this.xRange = xRange;
+    this.yRange = yRange;
+    this.onProgress = onProgress;
+    this.calculate = createCalculator({xRange, yRange, onProgress});
+  }
+}
+
 /**
  * @param {CalculatorRange[]} ranges
  * @return {Calculator}
