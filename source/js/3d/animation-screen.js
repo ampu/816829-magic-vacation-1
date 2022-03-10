@@ -1,11 +1,12 @@
 import * as THREE from 'three';
-import debounce from 'lodash/debounce';
 
 import {containSize} from 'helpers/document-helpers';
 import {ScreenId, ScreenState, addScreenListener} from 'helpers/screen-helpers';
 import CustomMaterial from './materials/custom-material';
 import TextureMaterial from './materials/texture-material';
 import {SLIDES, addSlideChangeListener} from 'modules/slider';
+import {FrameAnimation, calculateIteration} from 'helpers/frame-animation';
+import {NamedCalculator, createCalculator, createFadingSinusCalculator} from 'helpers/calculator';
 
 const INTRO_TEXTURE_URL = `./img/scenes-textures/scene-0.png`;
 const INTRO_TEXTURE_HUE_ROTATION = 0;
@@ -13,7 +14,22 @@ const INTRO_THEME_COLOR = `#5f458c`;
 
 const PLANE_SIZE = [2048, 1024];
 const PLANE_ASPECT = [PLANE_SIZE[0] / PLANE_SIZE[1], 1];
-const FPS_INTERVAL = 1000 / 60;
+const CUSTOM_ANIMATION_FREQUENCY = 300;
+
+const Bubble = {
+  FIRST: {
+    radius: 0.1,
+    delay: 0,
+  },
+  SECOND: {
+    radius: 0.066,
+    delay: 500,
+  },
+  THIRD: {
+    radius: 0.033,
+    delay: 1000,
+  },
+};
 
 const initScene = ({
   canvas,
@@ -66,7 +82,7 @@ const resizeScene = ({
   renderer.render(scene, camera);
 };
 
-const createTexturePlane = (textureUrl, hueRotation, isCustom) => {
+const createTexturePlane = (textureUrl, isCustom) => {
   const geometry = new THREE.PlaneBufferGeometry(...PLANE_SIZE);
 
   const texture = new THREE.TextureLoader().load(textureUrl);
@@ -75,11 +91,11 @@ const createTexturePlane = (textureUrl, hueRotation, isCustom) => {
     ? new CustomMaterial({
       map: texture,
       aspect: PLANE_ASPECT,
-      hueRotation,
+      hueRotation: 0,
       bubbles: [
-        new THREE.Vector3(0, 0, 0.1),
-        new THREE.Vector3(0, 0, 0.066),
-        new THREE.Vector3(0, 0, 0.033),
+        new THREE.Vector3(0, 0, Bubble.FIRST.radius),
+        new THREE.Vector3(0, 0, Bubble.SECOND.radius),
+        new THREE.Vector3(0, 0, Bubble.THIRD.radius),
       ],
     })
     : new TextureMaterial(texture);
@@ -91,7 +107,7 @@ export default () => {
   const animationScreen = document.querySelector(`.animation-screen`);
   const canvas = animationScreen.querySelector(`canvas`);
   const introTexturePlane = createTexturePlane(INTRO_TEXTURE_URL, INTRO_TEXTURE_HUE_ROTATION, false);
-  const slideTexturePlanes = SLIDES.map(({textureUrl, textureHueRotation, isCustom}) => createTexturePlane(textureUrl, textureHueRotation, isCustom));
+  const slideTexturePlanes = SLIDES.map(({textureUrl, isCustom}) => createTexturePlane(textureUrl, isCustom));
 
   const {renderer, scene, camera} = initScene({
     canvas,
@@ -103,38 +119,102 @@ export default () => {
     currentTexturePlane: introTexturePlane,
     currentSlide: SLIDES[0],
     currentSlideTexturePlane: slideTexturePlanes[0],
-    mouse: [0, 0],
   };
 
-  const renderTexturePlane = (texturePlane, themeColor) => {
+  const bubbleCalculators = [
+    {
+      getX: createFadingSinusCalculator({x: 2 / 3, y: 0.4, width: 3, height: 0.2, amplitude: 1, fadingRatio: 1}).calculateY,
+      getY: createCalculator({
+        xRange: [Bubble.FIRST.delay, Bubble.FIRST.delay + 1800],
+        yRange: [0 - Bubble.FIRST.radius, 1 + Bubble.FIRST.radius],
+      }),
+    },
+    {
+      getX: createFadingSinusCalculator({x: 1 / 3, y: 0.25, width: 3, height: 0.1, amplitude: 1, fadingRatio: 1}).calculateY,
+      getY: createCalculator({
+        xRange: [Bubble.SECOND.delay, Bubble.SECOND.delay + 1800],
+        yRange: [0 - Bubble.SECOND.radius, 1 + Bubble.SECOND.radius],
+      }),
+    },
+    {
+      getX: createFadingSinusCalculator({x: 0, y: 0.48, width: 3, height: 0.05, amplitude: 1, fadingRatio: 1}).calculateY,
+      getY: createCalculator({
+        xRange: [Bubble.THIRD.delay, Bubble.THIRD.delay + 1800],
+        yRange: [0 - Bubble.THIRD.radius, 1 + Bubble.THIRD.radius],
+      }),
+    },
+  ];
+
+  let hueRotationCalculator = null;
+  const customSlideAnimation = new FrameAnimation({
+    delay: 500,
+    duration: 1800 + Bubble.THIRD.delay,
+    onRenderFrame({progress, elapsed}) {
+      if (typeof tickFpsCounter !== `undefined`) {
+        /* eslint-disable-next-line no-undef */
+        tickFpsCounter(elapsed);
+      }
+
+      const slide = state.currentSlide;
+      const material = state.currentSlideTexturePlane.material;
+      const bubblesUniform = material.uniforms.bubbles;
+      const hueRotationUniform = material.uniforms.hueRotation;
+
+      const iteration = calculateIteration(elapsed, CUSTOM_ANIMATION_FREQUENCY);
+      if (!hueRotationCalculator || hueRotationCalculator.name !== iteration) {
+        const originalRange = slide.hueRotation;
+        const isEven = iteration % 2 === 0;
+
+        let previousRange = slide.hueRotation;
+        if (iteration !== 0) {
+          previousRange = isEven
+            ? hueRotationCalculator.yRange.slice().reverse()
+            : hueRotationCalculator.yRange;
+        }
+
+        const getMin = createCalculator({yRange: [originalRange[0], previousRange[1]]});
+        const getMax = createCalculator({yRange: [previousRange[0], originalRange[1]]});
+
+        const yRange = [
+          isEven ? previousRange[0] : previousRange[1],
+          isEven ? getMax(Math.random()) : getMin(Math.random()),
+        ];
+
+        hueRotationCalculator = new NamedCalculator(iteration, {yRange});
+      }
+
+      hueRotationUniform.value = hueRotationCalculator.calculateY(progress);
+
+      Object.keys(Bubble).forEach((_, i) => {
+        const {getX, getY} = bubbleCalculators[i];
+        const bubble = bubblesUniform.value[i];
+        if (getX && getY) {
+          bubble
+            .setX(getX(progress))
+            .setY(getY(elapsed));
+        }
+      });
+      material.uniformsNeedUpdate = true;
+      renderer.render(scene, camera);
+    },
+  });
+
+  const startRenderingTexturePlane = (texturePlane, themeColor, currentSlide) => {
     if (state.currentTexturePlane) {
       scene.remove(state.currentTexturePlane);
     }
     scene.add(texturePlane);
 
-    renderer.setClearColor(new THREE.Color(themeColor));
-    renderer.render(scene, camera);
-
     state.currentTexturePlane = texturePlane;
-  };
 
-  const render = debounce(() => {
-    const bubbles = state.currentTexturePlane.material.uniforms.bubbles;
-    if (bubbles) {
-      bubbles.value[0]
-        .setX(state.mouse[0])
-        .setY(state.mouse[1] + 0.25);
+    renderer.setClearColor(new THREE.Color(themeColor));
 
-      bubbles.value[1]
-        .setX(state.mouse[0] - 0.1)
-        .setY(state.mouse[1]);
-
-      bubbles.value[2]
-        .setX(state.mouse[0] + 0.1)
-        .setY(state.mouse[1] - 0.25);
+    if (currentSlide && currentSlide.isCustom) {
+      customSlideAnimation.start();
+      return;
     }
     renderer.render(scene, camera);
-  }, FPS_INTERVAL, {leading: false, trailing: true});
+  };
 
   const onWindowResize = () => {
     resizeScene({
@@ -146,33 +226,27 @@ export default () => {
     });
   };
 
-  const onDocumentMouseMove = (evt) => {
-    state.mouse = [
-      (evt.x - canvas.offsetLeft) / canvas.offsetWidth,
-      1 - (evt.y - canvas.offsetTop) / canvas.offsetHeight,
-    ];
-    render();
-  };
-
   window.addEventListener(`resize`, onWindowResize);
-  document.addEventListener(`mousemove`, onDocumentMouseMove);
 
   addScreenListener(ScreenId.INTRO, {
     [ScreenState.ACTIVE]: () => {
-      renderTexturePlane(introTexturePlane, INTRO_THEME_COLOR);
+      startRenderingTexturePlane(introTexturePlane, INTRO_THEME_COLOR, null);
     },
   });
 
   addScreenListener(ScreenId.STORY, {
     [ScreenState.ACTIVE]: () => {
-      renderTexturePlane(state.currentSlideTexturePlane, state.currentSlide.themeColor);
+      startRenderingTexturePlane(state.currentSlideTexturePlane, state.currentSlide.themeColor, state.currentSlide);
+    },
+    [ScreenState.HIDDEN]: () => {
+      customSlideAnimation.stop();
     },
   });
 
   addSlideChangeListener(({slideIndex, slide}) => {
     state.currentSlide = slide;
     state.currentSlideTexturePlane = slideTexturePlanes[slideIndex];
-    renderTexturePlane(state.currentSlideTexturePlane, state.currentSlide.themeColor);
+    startRenderingTexturePlane(state.currentSlideTexturePlane, state.currentSlide.themeColor, state.currentSlide);
   });
 
   renderer.render(scene, camera);

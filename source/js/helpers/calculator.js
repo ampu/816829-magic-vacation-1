@@ -12,7 +12,7 @@ import {easeLinear} from './easings';
  * }} CalculatorRange - assert(minX <= maxX)
  */
 
-const {PI, min, max, sin, cos, atan} = Math;
+const {PI, E, min, max, sin, cos, atan, pow} = Math;
 
 const HALF_CIRCLE_DEGREES = 180;
 const MAX_PROGRESS = 1;
@@ -54,6 +54,16 @@ export const createCalculator = ({
     return clamp(y, min(startY, endY), max(startY, endY));
   };
 };
+
+export class NamedCalculator {
+  constructor(name = ``, {xRange, yRange, onProgress}) {
+    this.name = name;
+    this.xRange = xRange;
+    this.yRange = yRange;
+    this.onProgress = onProgress;
+    this.calculateY = createCalculator({xRange, yRange, onProgress});
+  }
+}
 
 /**
  * @param {CalculatorRange[]} ranges
@@ -110,10 +120,28 @@ export const createCompositeCalculator = (ranges) => {
  *   calculateTangent: (function(progress: number): number),
  * }}
  */
-export const createSinusCalculator = ({x, y, width, height, amplitude}) => {
+export const createSinusCalculator = ({x = 0, y = 0, width = 1, height = 2, amplitude = 2 * PI}) => {
   const ratio = 2 * PI / amplitude;
   return {
     calculateY: (progress) => height / 2 * sin(ratio * (width * progress + x)) + y,
     calculateTangent: (progress) => height / 2 * ratio * cos(ratio * (width * progress + x)),
+  };
+};
+
+/**
+ * @param {number} x
+ * @param {number} y
+ * @param {number} width
+ * @param {number} height
+ * @param {number} amplitude
+ * @param {number} fadingRatio
+ * @return {{
+ *   calculateY: (function(progress: number): number ),
+ * }}
+ */
+export const createFadingSinusCalculator = ({x = 0, y = 0, width = 1, height = 2, amplitude = 2 * PI, fadingRatio = 1}) => {
+  const ratio = 2 * PI / amplitude;
+  return {
+    calculateY: (progress) => height / 2 * pow(E, -fadingRatio * progress) * sin(ratio * (width * progress + x)) + y,
   };
 };

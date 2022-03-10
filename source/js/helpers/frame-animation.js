@@ -17,6 +17,10 @@ const calculateProgress = (elapsed, duration, shouldAlternate) => {
     : Math.min(rawProgress, MAX_PROGRESS);
 };
 
+export const calculateIteration = (elapsed, duration) => {
+  return Math.max(0, Math.floor(elapsed / duration));
+};
+
 const calculateFrameId = (fps, progress, duration) => {
   return Math.trunc(progress * duration / MILLISECONDS_IN_SECOND * fps);
 };
@@ -129,6 +133,7 @@ export class FrameAnimation {
   _onFrame(performanceNow, shouldRequestNextFrameIfNeeded, shouldSkipDuplicate) {
     const currentTimestamp = TIME_ORIGIN + Math.trunc(performanceNow);
     const elapsed = calculateElapsed(currentTimestamp, this._startTimestamp, this._delay);
+    const iteration = calculateIteration(elapsed, this._duration);
     const progress = this._onProgress(calculateProgress(elapsed, this._duration, this._shouldAlternate));
     const renderFrameId = calculateFrameId(this._fps, progress, this._duration);
 
@@ -140,21 +145,25 @@ export class FrameAnimation {
     }
 
     this._latestRenderState = {
+      performanceNow,
       duration: this._duration,
       elapsed,
+      iteration,
       progress,
       regress: 1 - progress,
       frameId: renderFrameId,
       frame: this._frames ? this._frames[renderFrameId] : undefined,
     };
 
-    this._onRenderFrame(this._latestRenderState, this._userState);
+    const canContinue = this._onRenderFrame(this._latestRenderState, this._userState) !== false;
 
-    if (progress < MAX_PROGRESS || this._shouldAlternate) {
-      if (shouldRequestNextFrameIfNeeded) {
-        this._latestAnimationFrameId = requestAnimationFrame(this._onScheduleFrame);
+    if (canContinue) {
+      if (progress < MAX_PROGRESS || this._shouldAlternate) {
+        if (shouldRequestNextFrameIfNeeded) {
+          this._latestAnimationFrameId = requestAnimationFrame(this._onScheduleFrame);
+        }
+        return;
       }
-      return;
     }
     this._latestAnimationFrameId = 0;
   }
