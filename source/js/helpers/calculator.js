@@ -136,7 +136,7 @@ export const createSinusCalculator = ({x = 0, y = 0, width = 1, height = 2, ampl
  * @param {number} amplitude
  * @param {number} fadingRatio
  * @return {{
- *   calculateY: (function(progress: number): number ),
+ *   calculateY: (function(progress: number): number),
  * }}
  */
 export const createFadingSinusCalculator = ({x = 0, y = 0, width = 1, height = 2, amplitude = 2 * PI, fadingRatio = 1}) => {

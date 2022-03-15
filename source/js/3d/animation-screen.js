@@ -185,8 +185,7 @@ export default () => {
 
       hueRotationUniform.value = hueRotationCalculator.calculateY(progress);
 
-      Object.keys(Bubble).forEach((_, i) => {
-        const {getX, getY} = bubbleCalculators[i];
+      bubbleCalculators.forEach(({getX, getY}, i) => {
         const bubble = bubblesUniform.value[i];
         if (getX && getY) {
           bubble
