@@ -10,7 +10,8 @@ import result from 'modules/result.js';
 import form from 'modules/form.js';
 import social from 'modules/social.js';
 import game from 'modules/game';
-import animationScreen from '3d/animation-screen';
+// import animationScreen from '3d/animation-screen';
+import sandboxScreen from '3d/sandbox-screen';
 import sonya from 'modules/sonya';
 import fullPageScroll from 'modules/full-page-scroll';
 
@@ -26,6 +27,7 @@ result();
 form();
 social();
 game();
-animationScreen();
+// animationScreen();
+sandboxScreen();
 sonya();
 fullPageScroll();

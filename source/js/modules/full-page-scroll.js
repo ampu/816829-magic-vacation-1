@@ -61,7 +61,7 @@ class FullPageScroll {
   }
 
   init() {
-    document.addEventListener(`wheel`, this.onDocumentWheelHandler);
+    // document.addEventListener(`wheel`, this.onDocumentWheelHandler);
     window.addEventListener(`popstate`, this.onWindowPopStateHandler);
     window.addEventListener(`resize`, this.onWindowResizeHandler);
 

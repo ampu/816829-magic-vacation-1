@@ -215,7 +215,7 @@ export default () => {
     renderer.render(scene, camera);
   };
 
-  const onWindowResize = () => {
+  window.addEventListener(`resize`, () => {
     resizeScene({
       renderer,
       scene,
@@ -223,9 +223,7 @@ export default () => {
       width: animationScreen.clientWidth,
       height: animationScreen.clientHeight,
     });
-  };
-
-  window.addEventListener(`resize`, onWindowResize);
+  });
 
   addScreenListener(ScreenId.INTRO, {
     [ScreenState.ACTIVE]: () => {
@@ -247,6 +245,4 @@ export default () => {
     state.currentSlideTexturePlane = slideTexturePlanes[slideIndex];
     startRenderingTexturePlane(state.currentSlideTexturePlane, state.currentSlide.themeColor, state.currentSlide);
   });
-
-  renderer.render(scene, camera);
 };

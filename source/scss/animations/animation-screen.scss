@@ -1,5 +1,6 @@
 .animation-screen {
   position: fixed;
+  z-index: 10;
   display: flex;
   flex-flow: column;
   justify-content: center;
