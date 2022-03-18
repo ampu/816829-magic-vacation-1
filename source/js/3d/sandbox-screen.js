@@ -2,9 +2,12 @@ import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 
 import {containSize} from 'helpers/document-helpers';
+import {addPyramid} from './objects/pyramid';
+import {addSnowman} from './objects/snowman';
+import {addLamppost} from './objects/lamppost';
 
 const PLANE_SIZE = [2048, 1024];
-const CAMERA_POSITION = [0, 0, 750];
+const CAMERA_POSITION = [1000, 1000, 1000];
 
 const createScene = ({
   canvas,
@@ -41,6 +44,9 @@ const createScene = ({
   camera.position.set(...CAMERA_POSITION);
   camera.lookAt(0, 0, 0);
 
+  const helper = new THREE.AxesHelper(300);
+  scene.add(helper);
+
   return {renderer, scene, camera};
 };
 
@@ -60,16 +66,6 @@ const resizeScene = ({
   renderer.render(scene, camera);
 };
 
-const addObject = (parent) => {
-  const geometry = new THREE.BoxGeometry(200, 200, 200);
-  const material = new THREE.MeshStandardMaterial({
-    color: 0xffaaaa,
-  });
-  const object = new THREE.Mesh(geometry, material);
-  parent.add(object);
-  return object;
-};
-
 const addOrbitControls = (renderer, camera) => {
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.target.set(0, 0, 0);
@@ -77,10 +73,23 @@ const addOrbitControls = (renderer, camera) => {
 };
 
 const addLightGroup = (parent) => {
-  const group = new THREE.Object3D();
+  const group = new THREE.Group();
   group.position.set(...CAMERA_POSITION);
   parent.add(group);
   return group;
+};
+
+const addHemisphereLight = (scene, parent) => {
+  const [x, y, z] = CAMERA_POSITION;
+
+  const light = new THREE.HemisphereLight(0xaaaaff, 0xaaffaa, 0.5);
+  light.position.set(-x, -y, -z);
+  parent.add(light);
+
+  const helper = new THREE.HemisphereLightHelper(light, 50);
+  scene.add(helper);
+
+  return light;
 };
 
 const addDirectionalLight = (scene, parent) => {
@@ -138,9 +147,12 @@ export default () => {
 
   addOrbitControls(renderer, camera);
 
-  addObject(scene);
+  addPyramid(scene);
+  addSnowman(scene);
+  addLamppost(scene);
 
   const lightGroup = addLightGroup(scene);
+  addHemisphereLight(scene, lightGroup);
   addDirectionalLight(scene, lightGroup);
   addPointLight1(scene, lightGroup);
   addPointLight2(scene, lightGroup);
