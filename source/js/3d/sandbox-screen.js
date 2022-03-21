@@ -2,12 +2,15 @@ import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 
 import {containSize} from 'helpers/document-helpers';
-import {addPyramid} from './objects/pyramid';
-import {addSnowman} from './objects/snowman';
-import {addLamppost} from './objects/lamppost';
+import {addFlamingo} from './objects/flamingo';
+import {addQuestion} from './objects/question';
+import {addSnowflake} from './objects/snowflake';
+import {addBigLeaf, addSmallLeaf} from './objects/leaf';
+import {addFlower} from './objects/flower';
+import {addKeyhole} from './objects/keyhole';
 
 const PLANE_SIZE = [2048, 1024];
-const CAMERA_POSITION = [1000, 1000, 1000];
+const CAMERA_POSITION = [2000, 2000, 2000];
 
 const createScene = ({
   canvas,
@@ -15,7 +18,7 @@ const createScene = ({
   height,
   fov = 35,
   near = 0.1,
-  far = 5000,
+  far = 10000,
   clearColor = 0x000000,
 }) => {
   [width, height] = containSize(PLANE_SIZE, [width, height]);
@@ -44,8 +47,8 @@ const createScene = ({
   camera.position.set(...CAMERA_POSITION);
   camera.lookAt(0, 0, 0);
 
-  const helper = new THREE.AxesHelper(300);
-  scene.add(helper);
+  scene.add(new THREE.AxesHelper(300));
+  scene.add(new THREE.GridHelper(2000));
 
   return {renderer, scene, camera};
 };
@@ -147,10 +150,6 @@ export default () => {
 
   addOrbitControls(renderer, camera);
 
-  addPyramid(scene);
-  addSnowman(scene);
-  addLamppost(scene);
-
   const lightGroup = addLightGroup(scene);
   addHemisphereLight(scene, lightGroup);
   addDirectionalLight(scene, lightGroup);
@@ -166,6 +165,14 @@ export default () => {
       height: animationScreen.clientHeight,
     });
   });
+
+  addFlamingo(scene);
+  addQuestion(scene);
+  addSnowflake(scene);
+  addBigLeaf(scene);
+  addSmallLeaf(scene);
+  addFlower(scene);
+  addKeyhole(scene);
 
   const render = (performanceNow) => {
     if (typeof tickFpsCounter !== `undefined`) {
