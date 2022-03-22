@@ -2,15 +2,12 @@ import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 
 import {containSize} from 'helpers/document-helpers';
-import {addFlamingo} from './objects/flamingo';
-import {addQuestion} from './objects/question';
-import {addSnowflake} from './objects/snowflake';
-import {addBigLeaf, addSmallLeaf} from './objects/leaf';
-import {addFlower} from './objects/flower';
-import {addKeyhole} from './objects/keyhole';
+import {addSaturn} from './objects/saturn';
+import {addCarpet} from './objects/carpet';
+import {addRoad} from './objects/road';
 
 const PLANE_SIZE = [2048, 1024];
-const CAMERA_POSITION = [2000, 2000, 2000];
+const CAMERA_POSITION = [1500, 1500, 1500];
 
 const createScene = ({
   canvas,
@@ -18,7 +15,7 @@ const createScene = ({
   height,
   fov = 35,
   near = 0.1,
-  far = 10000,
+  far = 5000,
   clearColor = 0x000000,
 }) => {
   [width, height] = containSize(PLANE_SIZE, [width, height]);
@@ -28,13 +25,11 @@ const createScene = ({
       canvas,
       /* eslint-disable-next-line no-undef */
       context: WebGLDebugUtils.makeDebugContext(canvas.getContext(`webgl`)),
-      alpha: true,
-      antialias: false,
+      powerPreference: `high-performance`,
     })
     : new THREE.WebGLRenderer({
       canvas,
-      alpha: true,
-      antialias: false,
+      powerPreference: `high-performance`,
     });
 
   renderer.setPixelRatio(window.devicePixelRatio);
@@ -166,13 +161,9 @@ export default () => {
     });
   });
 
-  addFlamingo(scene);
-  addQuestion(scene);
-  addSnowflake(scene);
-  addBigLeaf(scene);
-  addSmallLeaf(scene);
-  addFlower(scene);
-  addKeyhole(scene);
+  addCarpet(scene);
+  addRoad(scene);
+  addSaturn(scene);
 
   const render = (performanceNow) => {
     if (typeof tickFpsCounter !== `undefined`) {
