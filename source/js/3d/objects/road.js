@@ -51,6 +51,10 @@ const addStripe = (parent, stripeIndex) => {
   });
 
   const object = new THREE.Mesh(geometry, material);
+  object.renderOrder = 1;
+  object.onBeforeRender = (renderer) => {
+    renderer.clearDepth();
+  };
 
   parent.add(object);
   return object;
