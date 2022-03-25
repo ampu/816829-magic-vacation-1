@@ -1,7 +1,7 @@
 import * as THREE from 'three';
+import {Material} from '3d/materials/materials';
 
 const SEGMENTS = 32;
-const SPHERE_COLOR = 0xb3d1f2;
 
 const Sphere = {
   BIG: {
@@ -18,7 +18,6 @@ const NOSE = {
   branch: 75,
   radius: 18,
   offset: 32,
-  color: 0xf8431d,
   zRotation: -90,
   heightSegments: 1,
 };
@@ -26,11 +25,7 @@ const NOSE = {
 const addSphere = (parent, {radius, y}) => {
   const geometry = new THREE.SphereGeometry(radius, SEGMENTS, SEGMENTS);
 
-  const material = new THREE.MeshStandardMaterial({
-    color: SPHERE_COLOR,
-  });
-
-  const object = new THREE.Mesh(geometry, material);
+  const object = new THREE.Mesh(geometry, Material.STRONG_SNOW);
   object.position.set(0, y, 0);
 
   parent.add(object);
@@ -44,11 +39,7 @@ const addNose = (parent) => {
 
   const geometry = new THREE.ConeGeometry(NOSE.radius, height, SEGMENTS, NOSE.heightSegments);
 
-  const material = new THREE.MeshStandardMaterial({
-    color: NOSE.color,
-  });
-
-  const object = new THREE.Mesh(geometry, material);
+  const object = new THREE.Mesh(geometry, Material.SOFT_ORANGE);
   object.position.set(x, y, 0);
   object.rotation.set(0, 0, THREE.MathUtils.degToRad(NOSE.zRotation));
 

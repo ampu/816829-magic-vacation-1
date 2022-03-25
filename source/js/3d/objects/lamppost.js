@@ -1,13 +1,9 @@
 import * as THREE from 'three';
+import {Material} from '3d/materials/materials';
 
 const CIRCLE_SEGMENTS = 32;
 const SQUARE_SEGMENTS = 4;
 const LINE_SEGMENTS = 1;
-
-const Color = {
-  DARK: 0x1e76f1,
-  LIGHT: 0x93b3f8,
-};
 
 const LANTERN_TOP = {
   topRadius: 45 / Math.sqrt(2),
@@ -47,11 +43,7 @@ const addLanternTop = (parent, bottomY) => {
 
   const geometry = new THREE.CylinderGeometry(LANTERN_TOP.topRadius, LANTERN_TOP.bottomRadius, LANTERN_TOP.height, SQUARE_SEGMENTS, LINE_SEGMENTS);
 
-  const material = new THREE.MeshStandardMaterial({
-    color: Color.DARK,
-  });
-
-  const object = new THREE.Mesh(geometry, material);
+  const object = new THREE.Mesh(geometry, Material.SOFT_BLUE);
   object.position.set(0, y, 0);
 
   parent.add(object);
@@ -63,11 +55,7 @@ const addLanternMiddle = (parent, bottomY) => {
 
   const geometry = new THREE.CylinderGeometry(LANTERN_MIDDLE.topRadius, LANTERN_MIDDLE.bottomRadius, LANTERN_MIDDLE.height, SQUARE_SEGMENTS, LINE_SEGMENTS);
 
-  const material = new THREE.MeshStandardMaterial({
-    color: Color.LIGHT,
-  });
-
-  const object = new THREE.Mesh(geometry, material);
+  const object = new THREE.Mesh(geometry, Material.SOFT_LIGHT_BLUE);
   object.position.set(0, y, 0);
 
   parent.add(object);
@@ -79,11 +67,7 @@ const addLanternBottom = (parent, bottomY) => {
 
   const geometry = new THREE.CylinderGeometry(LANTERN_BOTTOM.topRadius, LANTERN_BOTTOM.bottomRadius, LANTERN_BOTTOM.height, SQUARE_SEGMENTS, LINE_SEGMENTS);
 
-  const material = new THREE.MeshStandardMaterial({
-    color: Color.DARK,
-  });
-
-  const object = new THREE.Mesh(geometry, material);
+  const object = new THREE.Mesh(geometry, Material.SOFT_BLUE);
   object.position.set(0, y, 0);
 
   parent.add(object);
@@ -95,11 +79,7 @@ const addBody = (parent, bottomY) => {
 
   const geometry = new THREE.CylinderGeometry(BODY.radius, BODY.radius, BODY.height, CIRCLE_SEGMENTS, LINE_SEGMENTS);
 
-  const material = new THREE.MeshStandardMaterial({
-    color: Color.DARK,
-  });
-
-  const object = new THREE.Mesh(geometry, material);
+  const object = new THREE.Mesh(geometry, Material.SOFT_BLUE);
   object.position.set(0, y, 0);
 
   parent.add(object);
@@ -109,11 +89,7 @@ const addBody = (parent, bottomY) => {
 const addJoint = (parent, y) => {
   const geometry = new THREE.SphereGeometry(JOINT.radius, CIRCLE_SEGMENTS, CIRCLE_SEGMENTS);
 
-  const material = new THREE.MeshStandardMaterial({
-    color: Color.DARK,
-  });
-
-  const object = new THREE.Mesh(geometry, material);
+  const object = new THREE.Mesh(geometry, Material.SOFT_BLUE);
   object.position.set(0, y, 0);
 
   parent.add(object);
@@ -123,11 +99,7 @@ const addJoint = (parent, y) => {
 const addBase = (parent) => {
   const geometry = new THREE.CylinderGeometry(BASE.radius, BASE.radius, BASE.height, CIRCLE_SEGMENTS, LINE_SEGMENTS);
 
-  const material = new THREE.MeshStandardMaterial({
-    color: Color.DARK,
-  });
-
-  const object = new THREE.Mesh(geometry, material);
+  const object = new THREE.Mesh(geometry, Material.SOFT_BLUE);
   object.position.set(0, BASE.height / 2, 0);
 
   parent.add(object);

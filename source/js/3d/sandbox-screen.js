@@ -2,12 +2,26 @@ import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 
 import {containSize} from 'helpers/document-helpers';
-import {addSaturn} from './objects/saturn';
+import {StateStorage} from "../helpers/state-storage";
+
+import {addDirectionalLight, addHemisphereLight, addLightGroup, addPointLight1, addPointLight2} from './lights/lights';
+
+import {addPyramid} from './objects/pyramid';
+import {addSaturn1, addSaturn4} from './objects/saturn';
 import {addCarpet} from './objects/carpet';
 import {addRoad} from './objects/road';
+import {addLamppost} from './objects/lamppost';
+import {addSnowman} from './objects/snowman';
+import {addBigLeaf, addSmallLeaf} from './objects/leaf';
+import {addFlamingo} from './objects/flamingo';
+import {addSnowflake} from './objects/snowflake';
+import {addQuestion} from './objects/question';
+import {addKeyhole} from './objects/keyhole';
 
 const PLANE_SIZE = [2048, 1024];
-const CAMERA_POSITION = [1500, 1500, 1500];
+const DEFAULT_CAMERA_POSITION = {x: 1500, y: 1500, z: 1500};
+
+const cameraPositionStorage = new StateStorage(sessionStorage, `camera-position`);
 
 const createScene = ({
   canvas,
@@ -15,7 +29,7 @@ const createScene = ({
   height,
   fov = 35,
   near = 0.1,
-  far = 5000,
+  far = 10000,
   clearColor = 0x000000,
 }) => {
   [width, height] = containSize(PLANE_SIZE, [width, height]);
@@ -39,7 +53,7 @@ const createScene = ({
   const scene = new THREE.Scene();
 
   const camera = new THREE.PerspectiveCamera(fov, width / height, near, far);
-  camera.position.set(...CAMERA_POSITION);
+  camera.position.copy(cameraPositionStorage.getState(DEFAULT_CAMERA_POSITION));
   camera.lookAt(0, 0, 0);
 
   scene.add(new THREE.AxesHelper(300));
@@ -64,73 +78,11 @@ const resizeScene = ({
   renderer.render(scene, camera);
 };
 
-const addOrbitControls = (renderer, camera) => {
+const addOrbit = (renderer, camera) => {
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.target.set(0, 0, 0);
   controls.update();
-};
-
-const addLightGroup = (parent) => {
-  const group = new THREE.Group();
-  group.position.set(...CAMERA_POSITION);
-  parent.add(group);
-  return group;
-};
-
-const addHemisphereLight = (scene, parent) => {
-  const [x, y, z] = CAMERA_POSITION;
-
-  const light = new THREE.HemisphereLight(0xaaaaff, 0xaaffaa, 0.5);
-  light.position.set(-x, -y, -z);
-  parent.add(light);
-
-  const helper = new THREE.HemisphereLightHelper(light, 50);
-  scene.add(helper);
-
-  return light;
-};
-
-const addDirectionalLight = (scene, parent) => {
-  const [x, y, z] = CAMERA_POSITION;
-
-  const light = new THREE.DirectionalLight(`rgb(255, 255, 255)`, 0.84);
-  light.target.position.set(-x, -y, -z);
-  light.target.position.y -= z * Math.tan(THREE.MathUtils.degToRad(15));
-  light.target.updateMatrixWorld();
-
-  parent.add(light);
-  parent.add(light.target);
-
-  const helper = new THREE.DirectionalLightHelper(light, 50);
-  scene.add(helper);
-
-  return light;
-};
-
-const addPointLight1 = (scene, parent) => {
-  const light = new THREE.PointLight(`rgb(246, 242, 255)`, 0.6, 1975, 2.0);
-  light.position.x -= 785;
-  light.position.y -= 350;
-  light.position.z -= 710;
-  parent.add(light);
-
-  const helper = new THREE.PointLightHelper(light, 50);
-  scene.add(helper);
-
-  return light;
-};
-
-const addPointLight2 = (scene, parent) => {
-  const light = new THREE.PointLight(`rgb(245, 254, 255)`, 0.95, 1975, 2.0);
-  light.position.x += 730;
-  light.position.y += 800;
-  light.position.z -= 985;
-  parent.add(light);
-
-  const helper = new THREE.PointLightHelper(light, 50);
-  scene.add(helper);
-
-  return light;
+  return controls;
 };
 
 export default () => {
@@ -143,11 +95,11 @@ export default () => {
     height: animationScreen.clientHeight,
   });
 
-  addOrbitControls(renderer, camera);
+  let orbit = addOrbit(renderer, camera);
 
-  const lightGroup = addLightGroup(scene);
-  addHemisphereLight(scene, lightGroup);
-  addDirectionalLight(scene, lightGroup);
+  const lightGroup = addLightGroup(scene, DEFAULT_CAMERA_POSITION);
+  addHemisphereLight(scene, lightGroup, DEFAULT_CAMERA_POSITION);
+  addDirectionalLight(scene, lightGroup, DEFAULT_CAMERA_POSITION);
   addPointLight1(scene, lightGroup);
   addPointLight2(scene, lightGroup);
 
@@ -161,15 +113,36 @@ export default () => {
     });
   });
 
+  document.addEventListener(`keydown`, (evt) => {
+    if (evt.key === `Escape`) {
+      camera.position.copy(DEFAULT_CAMERA_POSITION);
+      orbit.dispose();
+      orbit = addOrbit(renderer, camera);
+    }
+  });
+
   addCarpet(scene);
   addRoad(scene);
-  addSaturn(scene);
+
+  addSaturn1(scene);
+  addSaturn4(scene);
+  addPyramid(scene);
+  addLamppost(scene);
+  addSnowman(scene);
+
+  addSmallLeaf(scene);
+  addBigLeaf(scene);
+  addFlamingo(scene);
+  addSnowflake(scene);
+  addQuestion(scene);
+  addKeyhole(scene);
 
   const render = (performanceNow) => {
     if (typeof tickFpsCounter !== `undefined`) {
       /* eslint-disable-next-line no-undef */
       tickFpsCounter(performanceNow);
     }
+    cameraPositionStorage.setState(camera.position);
     renderer.render(scene, camera);
     requestAnimationFrame(render);
   };

@@ -3,13 +3,21 @@ import {SVGLoader} from 'three/examples/jsm/loaders/SVGLoader';
 
 const SCALED_EXTRUDE_OPTIONS = [`depth`, `bevelSize`, `bevelThickness`, `bevelOffset`];
 
-const createShapeGeometry = (shapes) => new THREE.ShapeGeometry(shapes);
+const createDefaultGeometry = (shapes) => new THREE.ShapeGeometry(shapes);
+
+const createDefaultMaterial = (color) => new THREE.MeshStandardMaterial({
+  color,
+  side: THREE.DoubleSide,
+});
 
 /**
  * @param {string} url
+ * @param {number} height
+ * @param {object} extrudeOptions
+ * @param {function(color): THREE.Material} onGetMaterial
  * @return {Promise<Group>}
  */
-export const loadSVGGroup = async ({url, height, extrudeOptions}) => {
+export const loadSVGGroup = async ({url, height, extrudeOptions, onGetMaterial}) => {
   const svg = await loadSVG(url);
 
   const size = getPathsSize(svg.paths);
@@ -24,7 +32,7 @@ export const loadSVGGroup = async ({url, height, extrudeOptions}) => {
     }));
   }
 
-  const group = convertPathsToGroup(svg.paths, extrudeOptions);
+  const group = convertPathsToGroup(svg.paths, extrudeOptions, onGetMaterial);
   group.scale.set(scale, -scale, scale);
   group.position.y = size.y * scale;
 
@@ -47,6 +55,10 @@ const loadSVG = async (url) => {
   });
 };
 
+/**
+ * @param {THREE.ShapePath[]} paths
+ * @return {Vector3}
+ */
 const getPathsSize = (paths) => {
   const group = new THREE.Group();
   for (const path of paths) {
@@ -63,12 +75,13 @@ const getPathsSize = (paths) => {
 /**
  * @param {THREE.ShapePath[]} paths
  * @param {object} extrudeOptions
+ * @param {function(color): THREE.Material} onGetMaterial
  * @return {Group}
  */
-const convertPathsToGroup = (paths, extrudeOptions) => {
+const convertPathsToGroup = (paths, extrudeOptions, onGetMaterial) => {
   const group = new THREE.Group();
   for (const path of paths) {
-    addPathMesh(group, path, (shapes) => new THREE.ExtrudeGeometry(shapes, extrudeOptions));
+    addPathMesh(group, path, onGetMaterial, (shapes) => new THREE.ExtrudeGeometry(shapes, extrudeOptions));
   }
   return group;
 };
@@ -76,17 +89,14 @@ const convertPathsToGroup = (paths, extrudeOptions) => {
 /**
  * @param {THREE.Object3D} parent
  * @param {THREE.ShapePath} path
- * @param {function(shapes: THREE.Shape[]): THREE.Geometry} onCreateGeometry
+ * @param {function(color): THREE.Material} onGetMaterial
+ * @param {function(shapes: THREE.Shape[]): THREE.Geometry} onGetGeometry
  * @return {THREE.Object3D}
  */
-const addPathMesh = (parent, path, onCreateGeometry = createShapeGeometry) => {
-  const material = new THREE.MeshStandardMaterial({
-    color: path.color,
-    side: THREE.DoubleSide,
-    depthWrite: true,
-  });
+const addPathMesh = (parent, path, onGetMaterial = createDefaultMaterial, onGetGeometry = createDefaultGeometry) => {
+  const material = onGetMaterial(path.color);
 
-  const geometry = onCreateGeometry(SVGLoader.createShapes(path));
+  const geometry = onGetGeometry(SVGLoader.createShapes(path));
 
   const mesh = new THREE.Mesh(geometry, material);
   parent.add(mesh);

@@ -1,4 +1,5 @@
 import {loadSVGGroup} from '3d/helpers/svg-helpers';
+import {Material} from '3d/materials/materials';
 
 const FLAMINGO = {
   url: `./img/svg-forms/flamingo.svg`,
@@ -11,12 +12,13 @@ const FLAMINGO = {
     bevelThickness: 2,
     bevelOffset: 0,
   },
+  onGetMaterial: () => Material.SOFT_LIGHT_DOMINANT_RED,
 };
 
 export const addFlamingo = async (parent) => {
   const object = await loadSVGGroup(FLAMINGO);
-  object.position.set(0, 0, 200);
-  object.rotateY(Math.PI / 2);
+  object.position.set(250, 0, 250);
+  object.rotateY(Math.PI / 4);
 
   parent.add(object);
   return object;

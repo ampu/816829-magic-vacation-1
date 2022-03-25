@@ -1,4 +1,5 @@
 import {loadSVGGroup} from '3d/helpers/svg-helpers';
+import {Material} from '3d/materials/materials';
 
 const BIG_LEAF = {
   url: `./img/svg-forms/leaf.svg`,
@@ -11,6 +12,7 @@ const BIG_LEAF = {
     bevelThickness: 3,
     bevelOffset: 0,
   },
+  onGetMaterial: () => Material.BASIC_GREEN,
 };
 
 const SMALL_LEAF = {
@@ -24,11 +26,12 @@ const SMALL_LEAF = {
     bevelThickness: 3,
     bevelOffset: 0,
   },
+  onGetMaterial: () => Material.BASIC_GREEN,
 };
 
 export const addBigLeaf = async (parent) => {
   const object = await loadSVGGroup(BIG_LEAF);
-  object.position.set(0, 0, 550);
+  object.position.set(0, 0, 650);
   object.rotateY(Math.PI / 2);
 
   parent.add(object);
@@ -37,7 +40,7 @@ export const addBigLeaf = async (parent) => {
 
 export const addSmallLeaf = async (parent) => {
   const object = await loadSVGGroup(SMALL_LEAF);
-  object.position.set(0, 0, 550);
+  object.position.set(0, 0, 650);
   object.rotateY(Math.PI / 2);
 
   parent.add(object);
