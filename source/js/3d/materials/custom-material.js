@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import vertexShader from 'glsl/custom-vertex-shader';
+import vertexShader from 'glsl/base-vertex-shader';
 import fragmentShader from 'glsl/custom-fragment-shader';
 
 export default class CustomMaterial extends THREE.RawShaderMaterial {
@@ -27,7 +27,7 @@ export default class CustomMaterial extends THREE.RawShaderMaterial {
         },
       },
       vertexShader,
-      fragmentShader: fragmentShader.split(`;`).join(`;\n`),
+      fragmentShader,
     });
   }
 }

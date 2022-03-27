@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-const Color = {
+export const Color = {
   BLUE: `rgb(51, 113, 235)`,
   BRIGHT_BLUE: `rgb(47, 58, 201)`,
   LIGHT_BLUE: `rgb(150, 176, 243)`,
@@ -28,7 +28,7 @@ const Color = {
   SNOW: `rgb(182, 206, 240)`,
 };
 
-const Reflection = {
+export const Reflection = {
   SOFT: {
     roughness: 0.55,
   },

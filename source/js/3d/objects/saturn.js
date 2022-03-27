@@ -72,9 +72,9 @@ const addSaturn = (parent, position, redMaterial, purpleMaterial) => {
 };
 
 export const addSaturn1 = (parent) => {
-  addSaturn(parent, {x: -200, y: 200, z: 0}, Material.SOFT_DOMINANT_RED, Material.SOFT_BRIGHT_PURPLE);
+  return addSaturn(parent, {x: -200, y: 200, z: 0}, Material.SOFT_DOMINANT_RED, Material.SOFT_BRIGHT_PURPLE);
 };
 
 export const addSaturn4 = (parent) => {
-  addSaturn(parent, {x: 0, y: 200, z: -200}, Material.SOFT_SHADOWED_DOMINANT_RED, Material.SOFT_SHADOWED_BRIGHT_PURPLE);
+  return addSaturn(parent, {x: 0, y: 200, z: -200}, Material.SOFT_SHADOWED_DOMINANT_RED, Material.SOFT_SHADOWED_BRIGHT_PURPLE);
 };

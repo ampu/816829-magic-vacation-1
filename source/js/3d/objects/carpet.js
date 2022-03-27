@@ -1,14 +1,14 @@
 import * as THREE from 'three';
+import {Color, Reflection} from '3d/materials/materials';
+import CarpetMaterial from '3d/materials/carpet-material';
 
 const LATHE_SEGMENTS = 32;
-const CARPET_COUNT = 7;
+const ITEM_COUNT = 7;
 const WIDTH = 180;
 const HEIGHT = 3;
 const INNER_RADIUS = 763;
 const PHI_START = 16;
 const PHI_END = 74;
-const DARK_COLOR = 0x664d9f;
-const LIGHT_COLOR = 0xa483cf;
 
 const POINTS = [
   new THREE.Vector2(INNER_RADIUS, 0),
@@ -18,14 +18,15 @@ const POINTS = [
   new THREE.Vector2(INNER_RADIUS, 0),
 ];
 
-const addCarpetItem = (parent, carpetIndex) => {
-  const phiLength = (PHI_END - PHI_START) / CARPET_COUNT;
-  const phiStart = PHI_START + carpetIndex * phiLength;
-  const geometry = new THREE.LatheGeometry(POINTS, LATHE_SEGMENTS, THREE.MathUtils.degToRad(phiStart), THREE.MathUtils.degToRad(phiLength));
+const addCarpet = (parent, color, additionalColor) => {
+  const geometry = new THREE.LatheGeometry(POINTS, LATHE_SEGMENTS, THREE.MathUtils.degToRad(PHI_START), THREE.MathUtils.degToRad(PHI_END - PHI_START));
 
-  const material = new THREE.MeshStandardMaterial({
-    color: carpetIndex % 2 === 0 ? LIGHT_COLOR : DARK_COLOR,
+  const material = new CarpetMaterial({
+    itemCount: ITEM_COUNT,
+    color,
+    additionalColor,
     side: THREE.DoubleSide,
+    ...Reflection.SOFT,
   });
 
   const object = new THREE.Mesh(geometry, material);
@@ -34,12 +35,14 @@ const addCarpetItem = (parent, carpetIndex) => {
   return object;
 };
 
-export const addCarpet = (parent) => {
-  const carpet = new THREE.Group();
-  carpet.position.y = 10;
-  for (let i = 0; i < CARPET_COUNT; i++) {
-    addCarpetItem(carpet, i);
-  }
-  parent.add(carpet);
+export const addCarpet1 = (parent) => {
+  const carpet = addCarpet(parent, Color.LIGHT_PURPLE, Color.ADDITIONAL_PURPLE);
+  carpet.position.y = 300;
+  return carpet;
+};
+
+export const addCarpet2 = (parent) => {
+  const carpet = addCarpet(parent, Color.SHADOWED_LIGHT_PURPLE, Color.SHADOWED_ADDITIONAL_PURPLE);
+  carpet.position.y = 100;
   return carpet;
 };

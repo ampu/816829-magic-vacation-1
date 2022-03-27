@@ -8,7 +8,7 @@ import {addDirectionalLight, addHemisphereLight, addLightGroup, addPointLight1, 
 
 import {addPyramid} from './objects/pyramid';
 import {addSaturn1, addSaturn4} from './objects/saturn';
-import {addCarpet} from './objects/carpet';
+import {addCarpet1, addCarpet2} from './objects/carpet';
 import {addRoad} from './objects/road';
 import {addLamppost} from './objects/lamppost';
 import {addSnowman} from './objects/snowman';
@@ -39,10 +39,12 @@ const createScene = ({
       canvas,
       /* eslint-disable-next-line no-undef */
       context: WebGLDebugUtils.makeDebugContext(canvas.getContext(`webgl`)),
+      logarithmicDepthBuffer: true,
       powerPreference: `high-performance`,
     })
     : new THREE.WebGLRenderer({
       canvas,
+      logarithmicDepthBuffer: true,
       powerPreference: `high-performance`,
     });
 
@@ -121,7 +123,8 @@ export default () => {
     }
   });
 
-  addCarpet(scene);
+  addCarpet1(scene);
+  addCarpet2(scene);
   addRoad(scene);
 
   addSaturn1(scene);
