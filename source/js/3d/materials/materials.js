@@ -51,7 +51,7 @@ export const Material = {
   SOFT_SHADOWED_BRIGHT_PURPLE: new THREE.MeshStandardMaterial({...Reflection.SOFT, color: Color.SHADOWED_BRIGHT_PURPLE}),
   SOFT_DARK_PURPLE: new THREE.MeshStandardMaterial({...Reflection.SOFT, color: Color.DARK_PURPLE}),
   SOFT_LIGHT_DOMINANT_RED: new THREE.MeshStandardMaterial({...Reflection.SOFT, color: Color.LIGHT_DOMINANT_RED}),
-  BASIC_PURPLE: new THREE.MeshStandardMaterial({...Reflection.BASIC, color: Color.PURPLE}),
+  BASIC_PURPLE: new THREE.MeshStandardMaterial({...Reflection.BASIC, color: Color.PURPLE, side: THREE.DoubleSide}),
   BASIC_BLUE: new THREE.MeshStandardMaterial({...Reflection.BASIC, color: Color.BLUE}),
   BASIC_GREEN: new THREE.MeshStandardMaterial({...Reflection.BASIC, color: Color.GREEN}),
   BASIC_WHITE: new THREE.MeshStandardMaterial({...Reflection.BASIC, color: Color.WHITE}),

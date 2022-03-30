@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {SVGLoader} from 'three/examples/jsm/loaders/SVGLoader';
+import {getObjectSize} from '3d/helpers/geometry-helpers';
 
 const SCALED_EXTRUDE_OPTIONS = [`depth`, `bevelSize`, `bevelThickness`, `bevelOffset`];
 
@@ -12,29 +13,33 @@ const createDefaultMaterial = (color) => new THREE.MeshStandardMaterial({
 
 /**
  * @param {string} url
+ * @param {number?} width
  * @param {number} height
  * @param {object} extrudeOptions
  * @param {function(color): THREE.Material} onGetMaterial
  * @return {Promise<Group>}
  */
-export const loadSVGGroup = async ({url, height, extrudeOptions, onGetMaterial}) => {
+export const loadSVGGroup = async ({url, width, height, extrudeOptions, onGetMaterial}) => {
   const svg = await loadSVG(url);
 
   const size = getPathsSize(svg.paths);
-  const scale = height ? height / size.y : 1;
+  const rawScaleY = height ? height / size.y : undefined;
+  const rawScaleX = width ? width / size.x : undefined;
+  const scaleX = rawScaleY || rawScaleX || 1;
+  const scaleY = rawScaleX || rawScaleY || 1;
 
-  if (scale !== 1) {
+  if (scaleY !== 1) {
     extrudeOptions = Object.fromEntries(Object.entries(extrudeOptions).map(([key, value]) => {
       if (SCALED_EXTRUDE_OPTIONS.includes(key)) {
-        value /= scale;
+        value /= scaleY;
       }
       return [key, value];
     }));
   }
 
   const group = convertPathsToGroup(svg.paths, extrudeOptions, onGetMaterial);
-  group.scale.set(scale, -scale, scale);
-  group.position.y = size.y * scale;
+  group.scale.set(scaleX, -scaleY, 1);
+  group.position.set(-size.x * scaleX / 2, size.y * scaleY / 2);
 
   const wrapper = new THREE.Group();
   wrapper.add(group);
@@ -64,12 +69,7 @@ const getPathsSize = (paths) => {
   for (const path of paths) {
     addPathMesh(group, path);
   }
-  const box = new THREE.Box3().setFromObject(group);
-  const size = new THREE.Vector3().copy(box.min).sub(box.max);
-  size.x = Math.abs(size.x);
-  size.y = Math.abs(size.y);
-  size.z = Math.abs(size.z);
-  return size;
+  return getObjectSize(group);
 };
 
 /**

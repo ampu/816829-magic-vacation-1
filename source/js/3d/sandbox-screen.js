@@ -5,27 +5,10 @@ import {containSize} from 'helpers/document-helpers';
 import {StateStorage} from "helpers/state-storage";
 
 import {addDirectionalLight, addHemisphereLight, addLightGroup, addPointLight1, addPointLight2} from './lights/lights';
-
-// import {addPyramid} from './objects/pyramid';
-// import {addSaturn1, addSaturn4} from './objects/saturn';
-//
-// import {addCarpet1, addCarpet2} from './objects/carpet';
-// import {addRoad} from './objects/road';
-//
-// import {addLamppost} from './objects/lamppost';
-// import {addSnowman} from './objects/snowman';
-// import {addBigLeaf, addSmallLeaf} from './objects/leaf';
-// import {addFlamingo} from './objects/flamingo';
-// import {addSnowflake} from './objects/snowflake';
-// import {addQuestion} from './objects/question';
-// import {addKeyhole} from './objects/keyhole';
-
-import {addAirplane} from './objects/airplane';
-import {addWatermelon} from './objects/watermelon';
-import {addSuitcase} from './objects/suitcase';
+import {addKeyholeScene} from './scenes/keyhole-scene';
 
 const PLANE_SIZE = [2048, 1024];
-const DEFAULT_CAMERA_POSITION = {x: 1500, y: 1500, z: 1500};
+const DEFAULT_CAMERA_POSITION = {x: 0, y: 0, z: 1000};
 
 const cameraPositionStorage = new StateStorage(sessionStorage, `camera-position`);
 
@@ -66,6 +49,14 @@ const createScene = ({
 
   scene.add(new THREE.AxesHelper(300));
   scene.add(new THREE.GridHelper(2000));
+
+  const yGrid = new THREE.GridHelper(2000);
+  yGrid.rotation.set(THREE.MathUtils.degToRad(90), 0, 0);
+  scene.add(yGrid);
+
+  const zGrid = new THREE.GridHelper(2000);
+  zGrid.rotation.set(0, 0, THREE.MathUtils.degToRad(90));
+  scene.add(zGrid);
 
   return {renderer, scene, camera};
 };
@@ -129,26 +120,7 @@ export default () => {
     }
   });
 
-  // addCarpet1(scene);
-  // addCarpet2(scene);
-  // addRoad(scene);
-  //
-  // addSaturn1(scene);
-  // addSaturn4(scene);
-  // addPyramid(scene);
-  // addLamppost(scene);
-  // addSnowman(scene);
-  //
-  // addSmallLeaf(scene);
-  // addBigLeaf(scene);
-  // addFlamingo(scene);
-  // addSnowflake(scene);
-  // addQuestion(scene);
-  // addKeyhole(scene);
-
-  addAirplane(scene);
-  addWatermelon(scene);
-  addSuitcase(scene);
+  addKeyholeScene(scene);
 
   const render = (performanceNow) => {
     if (typeof tickFpsCounter !== `undefined`) {

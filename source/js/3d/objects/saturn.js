@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import {squashTorusGeometry} from '3d/helpers/geometry-helpers';
+import {rotateObjectInDegrees, scaleObjectToFitHeight, squashTorusGeometry} from '3d/helpers/geometry-helpers';
 import {Material} from '3d/materials/materials';
 
 const CIRCLE_SEGMENTS = 32;
@@ -15,6 +15,16 @@ const RING_INNER_RADIUS = 80;
 const RING_OUTER_RADIUS = 120;
 const RING_ANGLE = 18;
 const RING_HEIGHT = 2;
+
+const HISTORY_SATURN = {
+  position: [0, 0, 0],
+};
+
+const KEYHOLE_SATURN = {
+  height: 65,
+  position: [335, -111, 100],
+  rotation: [20, -25, 10, `XYZ`],
+};
 
 const addPendant = (parent) => {
   const geometry = new THREE.CylinderGeometry(PENDANT_RADIUS, PENDANT_RADIUS, PENDANT_HEIGHT, CIRCLE_SEGMENTS, LINE_SEGMENTS);
@@ -58,12 +68,13 @@ const addRing = (parent, material) => {
   return object;
 };
 
-const addSaturn = (parent, position, redMaterial, purpleMaterial) => {
+const addSaturn = (parent, shouldRenderPendant, redMaterial, purpleMaterial) => {
   const saturn = new THREE.Group();
-  saturn.position.copy(position);
 
-  addPendant(saturn);
-  addSmallPlanet(saturn, purpleMaterial);
+  if (shouldRenderPendant) {
+    addPendant(saturn);
+    addSmallPlanet(saturn, purpleMaterial);
+  }
   const bigPlanet = addBigPlanet(saturn, redMaterial);
   addRing(bigPlanet, purpleMaterial);
 
@@ -71,10 +82,16 @@ const addSaturn = (parent, position, redMaterial, purpleMaterial) => {
   return saturn;
 };
 
-export const addSaturn1 = (parent) => {
-  return addSaturn(parent, {x: -200, y: 200, z: 0}, Material.SOFT_DOMINANT_RED, Material.SOFT_BRIGHT_PURPLE);
+export const addHistorySaturn = (parent) => {
+  const object = addSaturn(parent, true, Material.SOFT_DOMINANT_RED, Material.SOFT_BRIGHT_PURPLE);
+  object.position.set(...HISTORY_SATURN.position);
+  return object;
 };
 
-export const addSaturn4 = (parent) => {
-  return addSaturn(parent, {x: 0, y: 200, z: -200}, Material.SOFT_SHADOWED_DOMINANT_RED, Material.SOFT_SHADOWED_BRIGHT_PURPLE);
+export const addKeyholeSaturn = (parent) => {
+  const object = addSaturn(parent, false, Material.SOFT_SHADOWED_DOMINANT_RED, Material.SOFT_SHADOWED_BRIGHT_PURPLE);
+  scaleObjectToFitHeight(object, KEYHOLE_SATURN.height);
+  object.position.set(...KEYHOLE_SATURN.position);
+  rotateObjectInDegrees(object, KEYHOLE_SATURN.rotation);
+  return object;
 };
