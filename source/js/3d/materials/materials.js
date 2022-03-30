@@ -54,5 +54,6 @@ export const Material = {
   BASIC_PURPLE: new THREE.MeshStandardMaterial({...Reflection.BASIC, color: Color.PURPLE}),
   BASIC_BLUE: new THREE.MeshStandardMaterial({...Reflection.BASIC, color: Color.BLUE}),
   BASIC_GREEN: new THREE.MeshStandardMaterial({...Reflection.BASIC, color: Color.GREEN}),
+  BASIC_WHITE: new THREE.MeshStandardMaterial({...Reflection.BASIC, color: Color.WHITE}),
   STRONG_SNOW: new THREE.MeshStandardMaterial({...Reflection.STRONG, color: Color.SNOW}),
 };

@@ -1,6 +1,6 @@
 import Swiper from 'swiper';
 
-import {isMobileOrPortrait} from '../helpers/document-helpers';
+import {isMobileOrPortrait} from 'helpers/document-helpers';
 
 /** @enum {string} */
 const SlideEventType = {

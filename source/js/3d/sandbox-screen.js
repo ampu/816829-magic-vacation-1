@@ -2,21 +2,27 @@ import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 
 import {containSize} from 'helpers/document-helpers';
-import {StateStorage} from "../helpers/state-storage";
+import {StateStorage} from "helpers/state-storage";
 
 import {addDirectionalLight, addHemisphereLight, addLightGroup, addPointLight1, addPointLight2} from './lights/lights';
 
-import {addPyramid} from './objects/pyramid';
-import {addSaturn1, addSaturn4} from './objects/saturn';
-import {addCarpet1, addCarpet2} from './objects/carpet';
-import {addRoad} from './objects/road';
-import {addLamppost} from './objects/lamppost';
-import {addSnowman} from './objects/snowman';
-import {addBigLeaf, addSmallLeaf} from './objects/leaf';
-import {addFlamingo} from './objects/flamingo';
-import {addSnowflake} from './objects/snowflake';
-import {addQuestion} from './objects/question';
-import {addKeyhole} from './objects/keyhole';
+// import {addPyramid} from './objects/pyramid';
+// import {addSaturn1, addSaturn4} from './objects/saturn';
+//
+// import {addCarpet1, addCarpet2} from './objects/carpet';
+// import {addRoad} from './objects/road';
+//
+// import {addLamppost} from './objects/lamppost';
+// import {addSnowman} from './objects/snowman';
+// import {addBigLeaf, addSmallLeaf} from './objects/leaf';
+// import {addFlamingo} from './objects/flamingo';
+// import {addSnowflake} from './objects/snowflake';
+// import {addQuestion} from './objects/question';
+// import {addKeyhole} from './objects/keyhole';
+
+import {addAirplane} from './objects/airplane';
+import {addWatermelon} from './objects/watermelon';
+import {addSuitcase} from './objects/suitcase';
 
 const PLANE_SIZE = [2048, 1024];
 const DEFAULT_CAMERA_POSITION = {x: 1500, y: 1500, z: 1500};
@@ -123,22 +129,26 @@ export default () => {
     }
   });
 
-  addCarpet1(scene);
-  addCarpet2(scene);
-  addRoad(scene);
+  // addCarpet1(scene);
+  // addCarpet2(scene);
+  // addRoad(scene);
+  //
+  // addSaturn1(scene);
+  // addSaturn4(scene);
+  // addPyramid(scene);
+  // addLamppost(scene);
+  // addSnowman(scene);
+  //
+  // addSmallLeaf(scene);
+  // addBigLeaf(scene);
+  // addFlamingo(scene);
+  // addSnowflake(scene);
+  // addQuestion(scene);
+  // addKeyhole(scene);
 
-  addSaturn1(scene);
-  addSaturn4(scene);
-  addPyramid(scene);
-  addLamppost(scene);
-  addSnowman(scene);
-
-  addSmallLeaf(scene);
-  addBigLeaf(scene);
-  addFlamingo(scene);
-  addSnowflake(scene);
-  addQuestion(scene);
-  addKeyhole(scene);
+  addAirplane(scene);
+  addWatermelon(scene);
+  addSuitcase(scene);
 
   const render = (performanceNow) => {
     if (typeof tickFpsCounter !== `undefined`) {
