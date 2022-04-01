@@ -1,16 +1,21 @@
 import * as THREE from 'three';
+import * as lil from 'lil-gui';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 
 import {containSize} from 'helpers/document-helpers';
 import {StateStorage} from "helpers/state-storage";
 
 import {addDirectionalLight, addHemisphereLight, addLightGroup, addPointLight1, addPointLight2} from './lights/lights';
-import {addKeyholeScene} from './scenes/keyhole-scene';
+import {addDogScene} from './scenes/dog-scene';
+import {addPyramidScene} from './scenes/pyramid-scene';
+import {addCompassScene} from './scenes/compass-scene';
+import {addSonyaScene} from './scenes/sonya-scene';
 
 const PLANE_SIZE = [2048, 1024];
-const DEFAULT_CAMERA_POSITION = {x: 0, y: 0, z: 1000};
+const DEFAULT_CAMERA_POSITION = {x: Math.sqrt(2550 ** 2 / 2), y: 800, z: Math.sqrt(2550 ** 2 / 2)};
 
 const cameraPositionStorage = new StateStorage(sessionStorage, `camera-position`);
+const currentHistorySceneIndexStorage = new StateStorage(sessionStorage, `current-history-scene-index`);
 
 const createScene = ({
   canvas,
@@ -29,11 +34,13 @@ const createScene = ({
       /* eslint-disable-next-line no-undef */
       context: WebGLDebugUtils.makeDebugContext(canvas.getContext(`webgl`)),
       logarithmicDepthBuffer: true,
+      antialias: true,
       powerPreference: `high-performance`,
     })
     : new THREE.WebGLRenderer({
       canvas,
       logarithmicDepthBuffer: true,
+      antialias: true,
       powerPreference: `high-performance`,
     });
 
@@ -47,7 +54,7 @@ const createScene = ({
   camera.position.copy(cameraPositionStorage.getState(DEFAULT_CAMERA_POSITION));
   camera.lookAt(0, 0, 0);
 
-  scene.add(new THREE.AxesHelper(300));
+  scene.add(new THREE.AxesHelper(2000));
   scene.add(new THREE.GridHelper(2000));
 
   const yGrid = new THREE.GridHelper(2000);
@@ -88,7 +95,7 @@ export default () => {
   const animationScreen = document.querySelector(`.animation-screen`);
   const canvas = animationScreen.querySelector(`canvas`);
 
-  const {renderer, scene, camera} = createScene({
+  const {renderer, scene: mainScene, camera} = createScene({
     canvas,
     width: animationScreen.clientWidth,
     height: animationScreen.clientHeight,
@@ -96,16 +103,49 @@ export default () => {
 
   let orbit = addOrbit(renderer, camera);
 
-  const lightGroup = addLightGroup(scene, DEFAULT_CAMERA_POSITION);
-  addHemisphereLight(scene, lightGroup, DEFAULT_CAMERA_POSITION);
-  addDirectionalLight(scene, lightGroup, DEFAULT_CAMERA_POSITION);
-  addPointLight1(scene, lightGroup);
-  addPointLight2(scene, lightGroup);
+  const lightGroup = addLightGroup(mainScene, DEFAULT_CAMERA_POSITION);
+  addHemisphereLight(mainScene, lightGroup, DEFAULT_CAMERA_POSITION);
+  addDirectionalLight(mainScene, lightGroup, DEFAULT_CAMERA_POSITION);
+  addPointLight1(mainScene, lightGroup);
+  addPointLight2(mainScene, lightGroup);
+
+  let currentHistorySceneIndex = currentHistorySceneIndexStorage.getState(0);
+  const setCurrentHistorySceneIndex = (value) => {
+    currentHistorySceneIndex = (value + 4) % 4;
+    history.rotation.y = -currentHistorySceneIndex * Math.PI / 2;
+    sceneController.updateDisplay();
+    currentHistorySceneIndexStorage.setState(currentHistorySceneIndex);
+  };
+
+  const history = new THREE.Group();
+  history.rotation.y = -currentHistorySceneIndex * Math.PI / 2;
+
+  mainScene.add(history);
+  addDogScene(history, 0 * Math.PI / 2);
+  addPyramidScene(history, 1 * Math.PI / 2);
+  addCompassScene(history, 2 * Math.PI / 2);
+  addSonyaScene(history, 3 * Math.PI / 2);
+
+  // eslint-disable-next-line no-new
+  const gui = new lil.GUI({title: `Press &lt;TAB> to switch scene`});
+  const sceneController = gui.add({
+    get scene() {
+      return currentHistorySceneIndex;
+    },
+    set scene(value) {
+      setCurrentHistorySceneIndex(value);
+    },
+  }, `scene`, {
+    [`Dog`]: 0,
+    [`Pyramid`]: 1,
+    [`Compass`]: 2,
+    [`Sonya`]: 3,
+  });
 
   window.addEventListener(`resize`, () => {
     resizeScene({
       renderer,
-      scene,
+      scene: mainScene,
       camera,
       width: animationScreen.clientWidth,
       height: animationScreen.clientHeight,
@@ -115,12 +155,17 @@ export default () => {
   document.addEventListener(`keydown`, (evt) => {
     if (evt.key === `Escape`) {
       camera.position.copy(DEFAULT_CAMERA_POSITION);
+      setCurrentHistorySceneIndex(0);
       orbit.dispose();
       orbit = addOrbit(renderer, camera);
+      return;
+    }
+    if (evt.key === `Tab`) {
+      evt.preventDefault();
+      setCurrentHistorySceneIndex(currentHistorySceneIndex + (evt.shiftKey ? -1 : 1));
+      return;
     }
   });
-
-  addKeyholeScene(scene);
 
   const render = (performanceNow) => {
     if (typeof tickFpsCounter !== `undefined`) {
@@ -128,7 +173,7 @@ export default () => {
       tickFpsCounter(performanceNow);
     }
     cameraPositionStorage.setState(camera.position);
-    renderer.render(scene, camera);
+    renderer.render(mainScene, camera);
     requestAnimationFrame(render);
   };
   render();

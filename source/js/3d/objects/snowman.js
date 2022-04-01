@@ -22,6 +22,10 @@ const NOSE = {
   heightSegments: 1,
 };
 
+const SNOWMAN = {
+  position: [200, 50, 400],
+};
+
 const addSphere = (parent, {radius, y}) => {
   const geometry = new THREE.SphereGeometry(radius, SEGMENTS, SEGMENTS);
 
@@ -49,7 +53,7 @@ const addNose = (parent) => {
 
 export const addSnowman = (parent) => {
   const snowman = new THREE.Group();
-  snowman.position.x = 150;
+  snowman.position.set(...SNOWMAN.position);
 
   addNose(snowman);
   addSphere(snowman, Sphere.SMALL);

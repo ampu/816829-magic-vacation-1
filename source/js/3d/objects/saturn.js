@@ -16,8 +16,14 @@ const RING_OUTER_RADIUS = 120;
 const RING_ANGLE = 18;
 const RING_HEIGHT = 2;
 
-const HISTORY_SATURN = {
-  position: [0, 0, 0],
+const DOG_SATURN = {
+  position: [200, 450, 200],
+  rotation: [-2, 90, 0, `XYZ`],
+};
+
+const SONYA_SATURN = {
+  position: [200, 450, 200],
+  rotation: [-2, 90, 0, `XYZ`],
 };
 
 const KEYHOLE_SATURN = {
@@ -82,9 +88,17 @@ const addSaturn = (parent, shouldRenderPendant, redMaterial, purpleMaterial) => 
   return saturn;
 };
 
-export const addHistorySaturn = (parent) => {
+export const addDogSaturn = (parent) => {
   const object = addSaturn(parent, true, Material.SOFT_DOMINANT_RED, Material.SOFT_BRIGHT_PURPLE);
-  object.position.set(...HISTORY_SATURN.position);
+  object.position.set(...DOG_SATURN.position);
+  rotateObjectInDegrees(object, SONYA_SATURN.rotation);
+  return object;
+};
+
+export const addSonyaSaturn = (parent) => {
+  const object = addSaturn(parent, false, Material.SOFT_SHADOWED_DOMINANT_RED, Material.SOFT_SHADOWED_BRIGHT_PURPLE);
+  object.position.set(...SONYA_SATURN.position);
+  rotateObjectInDegrees(object, SONYA_SATURN.rotation);
   return object;
 };
 

@@ -36,7 +36,6 @@ export const addRoad = (parent) => {
   });
 
   const object = new THREE.Mesh(geometry, material);
-  object.position.y = 500;
 
   parent.add(object);
   return object;

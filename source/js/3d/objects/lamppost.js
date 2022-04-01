@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {Material} from '3d/materials/materials';
+import {rotateObjectInDegrees} from '3d/helpers/geometry-helpers';
 
 const CIRCLE_SEGMENTS = 32;
 const SQUARE_SEGMENTS = 4;
@@ -36,6 +37,11 @@ const JOINT = {
 const BASE = {
   radius: 16,
   height: 120,
+};
+
+const LAMPPOST = {
+  position: [640, 0, 110],
+  rotation: [0, 20, 0, `XYZ`],
 };
 
 const addLanternTop = (parent, bottomY) => {
@@ -108,6 +114,8 @@ const addBase = (parent) => {
 
 export const addLamppost = (parent) => {
   const lamppost = new THREE.Group();
+  lamppost.position.set(...LAMPPOST.position);
+  rotateObjectInDegrees(lamppost, LAMPPOST.rotation);
 
   addLanternTop(lamppost, BASE.height + JOINT.radius + BODY.height - BODY.yOffset + LANTERN_BOTTOM.height + LANTERN_MIDDLE.height);
   addLanternMiddle(lamppost, BASE.height + JOINT.radius + BODY.height - BODY.yOffset + LANTERN_BOTTOM.height);

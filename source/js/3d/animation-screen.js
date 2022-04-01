@@ -218,7 +218,7 @@ export default () => {
   window.addEventListener(`resize`, () => {
     resizeScene({
       renderer,
-      scene,
+      mainScene: scene,
       camera,
       width: animationScreen.clientWidth,
       height: animationScreen.clientHeight,

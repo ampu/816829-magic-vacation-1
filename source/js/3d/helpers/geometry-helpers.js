@@ -34,13 +34,21 @@ export const getObjectSize = (object) => {
 /**
  * @param {Object3D} object
  * @param {number} height
- * @param {Vector3} size
+ * @param {Vector3} currentSize
  * @return {Vector3}
  */
-export const scaleObjectToFitHeight = (object, height, size = getObjectSize(object)) => {
-  const scale = height / size.y;
+export const scaleObjectToFitHeight = (object, height, currentSize = getObjectSize(object)) => {
+  const scale = height / currentSize.y;
   object.scale.set(scale, scale, scale);
-  return size.clone().multiply(scale);
+  return currentSize.clone().multiply(scale);
+};
+
+export const scaleObjectToFitSize = (object, [x, y, z], currentSize = getObjectSize(object)) => {
+  const scaleX = x / currentSize.x;
+  const scaleY = y / currentSize.y;
+  const scaleZ = z / currentSize.z;
+  object.scale.set(scaleX, scaleY, scaleZ);
+  return new THREE.Vector3(x, y, z);
 };
 
 /**

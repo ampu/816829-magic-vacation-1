@@ -31,27 +31,36 @@ export const Color = {
 export const Reflection = {
   SOFT: {
     roughness: 0.55,
+    side: THREE.DoubleSide,
   },
   BASIC: {
     roughness: 0.5,
+    side: THREE.DoubleSide,
   },
   STRONG: {
     roughness: 0.4,
+    side: THREE.DoubleSide,
   },
 };
 
 export const Material = {
   SOFT_BLUE: new THREE.MeshStandardMaterial({...Reflection.SOFT, color: Color.BLUE}),
   SOFT_LIGHT_BLUE: new THREE.MeshStandardMaterial({...Reflection.SOFT, color: Color.LIGHT_BLUE}),
+  SOFT_SKY_LIGHT_BLUE: new THREE.MeshStandardMaterial({...Reflection.SOFT, color: Color.SKY_LIGHT_BLUE}),
+  SOFT_BRIGHT_BLUE: new THREE.MeshStandardMaterial({...Reflection.SOFT, color: Color.BRIGHT_BLUE}),
+  SOFT_MOUNTAIN_BLUE: new THREE.MeshStandardMaterial({...Reflection.SOFT, color: Color.MOUNTAIN_BLUE}),
   SOFT_ORANGE: new THREE.MeshStandardMaterial({...Reflection.SOFT, color: Color.ORANGE}),
   SOFT_DOMINANT_RED: new THREE.MeshStandardMaterial({...Reflection.SOFT, color: Color.DOMINANT_RED}),
+  SOFT_PURPLE: new THREE.MeshStandardMaterial({...Reflection.SOFT, color: Color.PURPLE}),
   SOFT_BRIGHT_PURPLE: new THREE.MeshStandardMaterial({...Reflection.SOFT, color: Color.BRIGHT_PURPLE}),
   SOFT_METAL_GREY: new THREE.MeshStandardMaterial({...Reflection.SOFT, color: Color.METAL_GREY}),
   SOFT_SHADOWED_DOMINANT_RED: new THREE.MeshStandardMaterial({...Reflection.SOFT, color: Color.SHADOWED_DOMINANT_RED}),
   SOFT_SHADOWED_BRIGHT_PURPLE: new THREE.MeshStandardMaterial({...Reflection.SOFT, color: Color.SHADOWED_BRIGHT_PURPLE}),
+  SOFT_SHADOWED_DARK_PURPLE: new THREE.MeshStandardMaterial({...Reflection.SOFT, color: Color.SHADOWED_DARK_PURPLE}),
   SOFT_DARK_PURPLE: new THREE.MeshStandardMaterial({...Reflection.SOFT, color: Color.DARK_PURPLE}),
   SOFT_LIGHT_DOMINANT_RED: new THREE.MeshStandardMaterial({...Reflection.SOFT, color: Color.LIGHT_DOMINANT_RED}),
-  BASIC_PURPLE: new THREE.MeshStandardMaterial({...Reflection.BASIC, color: Color.PURPLE, side: THREE.DoubleSide}),
+  BASIC_PURPLE: new THREE.MeshStandardMaterial({...Reflection.BASIC, color: Color.PURPLE}),
+  BASIC_SHADOWED_PURPLE: new THREE.MeshStandardMaterial({...Reflection.BASIC, color: Color.SHADOWED_PURPLE}),
   BASIC_BLUE: new THREE.MeshStandardMaterial({...Reflection.BASIC, color: Color.BLUE}),
   BASIC_GREEN: new THREE.MeshStandardMaterial({...Reflection.BASIC, color: Color.GREEN}),
   BASIC_WHITE: new THREE.MeshStandardMaterial({...Reflection.BASIC, color: Color.WHITE}),

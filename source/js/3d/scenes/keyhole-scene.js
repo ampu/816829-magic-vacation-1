@@ -4,7 +4,7 @@ import {addKeyhole} from '3d/objects/keyhole';
 import {addFlamingo} from '3d/objects/flamingo';
 import {addSnowflake} from '3d/objects/snowflake';
 import {addWatermelon} from '3d/objects/watermelon';
-import {addSuitcase} from '3d/objects/suitcase';
+import {addKeyholeSuitcase} from '3d/objects/suitcase';
 import {addAirplane} from '3d/objects/airplane';
 import {addQuestion} from '3d/objects/question';
 import {addKeyholeSaturn} from '3d/objects/saturn';
@@ -17,7 +17,7 @@ export const addKeyholeScene = async (parent) => {
   addFlamingo(scene);
   addSnowflake(scene);
   addWatermelon(scene);
-  addSuitcase(scene);
+  addKeyholeSuitcase(scene);
   addAirplane(scene);
   addQuestion(scene);
   addKeyholeSaturn(scene);

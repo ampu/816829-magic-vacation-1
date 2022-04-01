@@ -35,14 +35,11 @@ const addCarpet = (parent, color, additionalColor) => {
   return object;
 };
 
-export const addCarpet1 = (parent) => {
-  const carpet = addCarpet(parent, Color.LIGHT_PURPLE, Color.ADDITIONAL_PURPLE);
-  carpet.position.y = 300;
-  return carpet;
+export const addDogCarpet = (parent) => {
+  return addCarpet(parent, Color.LIGHT_PURPLE, Color.ADDITIONAL_PURPLE);
 };
 
-export const addCarpet2 = (parent) => {
+export const addSonyaCarpet = (parent) => {
   const carpet = addCarpet(parent, Color.SHADOWED_LIGHT_PURPLE, Color.SHADOWED_ADDITIONAL_PURPLE);
-  carpet.position.y = 100;
   return carpet;
 };
