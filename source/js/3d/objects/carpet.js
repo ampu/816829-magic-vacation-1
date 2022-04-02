@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {Color, Reflection} from '3d/materials/materials';
 import CarpetMaterial from '3d/materials/carpet-material';
+import {ObjectName} from '3d/constants/object-name';
 
 const LATHE_SEGMENTS = 32;
 const ITEM_COUNT = 7;
@@ -30,6 +31,7 @@ const addCarpet = (parent, color, additionalColor) => {
   });
 
   const object = new THREE.Mesh(geometry, material);
+  object.name = ObjectName.CARPET;
 
   parent.add(object);
   return object;
@@ -40,6 +42,5 @@ export const addDogCarpet = (parent) => {
 };
 
 export const addSonyaCarpet = (parent) => {
-  const carpet = addCarpet(parent, Color.SHADOWED_LIGHT_PURPLE, Color.SHADOWED_ADDITIONAL_PURPLE);
-  return carpet;
+  return addCarpet(parent, Color.SHADOWED_LIGHT_PURPLE, Color.SHADOWED_ADDITIONAL_PURPLE);
 };

@@ -1,15 +1,21 @@
 import * as THREE from 'three';
-import * as lil from 'lil-gui';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 
 import {containSize} from 'helpers/document-helpers';
-import {StateStorage} from "helpers/state-storage";
+import {StateStorage} from 'helpers/state-storage';
 
 import {addDirectionalLight, addHemisphereLight, addLightGroup, addPointLight1, addPointLight2} from './lights/lights';
 import {addDogScene} from './scenes/dog-scene';
 import {addPyramidScene} from './scenes/pyramid-scene';
 import {addCompassScene} from './scenes/compass-scene';
 import {addSonyaScene} from './scenes/sonya-scene';
+import {getGUI} from '3d/helpers/gui-helpers';
+import {ObjectName} from '3d/constants/object-name';
+
+const ShadowsRequirement = {
+  SCREEN_WIDTH: 1024,
+  HARDWARE_CONCURRENCY: 2,
+};
 
 const PLANE_SIZE = [2048, 1024];
 const DEFAULT_CAMERA_POSITION = {x: Math.sqrt(2550 ** 2 / 2), y: 800, z: Math.sqrt(2550 ** 2 / 2)};
@@ -43,6 +49,11 @@ const createScene = ({
       antialias: true,
       powerPreference: `high-performance`,
     });
+
+  renderer.shadowMap.enabled = window.innerWidth >= ShadowsRequirement.SCREEN_WIDTH
+    && navigator.hardwareConcurrency >= ShadowsRequirement.HARDWARE_CONCURRENCY;
+
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(width, height);
@@ -118,6 +129,7 @@ export default () => {
   };
 
   const history = new THREE.Group();
+  history.name = ObjectName.HISTORY;
   history.rotation.y = -currentHistorySceneIndex * Math.PI / 2;
 
   mainScene.add(history);
@@ -126,8 +138,7 @@ export default () => {
   addCompassScene(history, 2 * Math.PI / 2);
   addSonyaScene(history, 3 * Math.PI / 2);
 
-  // eslint-disable-next-line no-new
-  const gui = new lil.GUI({title: `Press &lt;TAB> to switch scene`});
+  const gui = getGUI(`Press &lt;TAB> to switch scene`);
   const sceneController = gui.add({
     get scene() {
       return currentHistorySceneIndex;

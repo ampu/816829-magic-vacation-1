@@ -1,5 +1,5 @@
 import {GLTFLoader} from 'three/examples/jsm/loaders/gltfloader';
-import {scaleObjectToFitHeight, rotateObjectInDegrees} from '3d/helpers/geometry-helpers';
+import {scaleObjectToFitHeight, rotateObjectInDegrees} from '3d/helpers/object-helpers';
 
 const WATERMELON = {
   url: `./3d/module-6/scene-0-objects/watermelon.gltf`,

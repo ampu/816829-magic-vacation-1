@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import {Material} from '3d/materials/materials';
-import {rotateObjectInDegrees} from '3d/helpers/geometry-helpers';
+import {rotateObjectInDegrees} from '3d/helpers/object-helpers';
 
 const PYRAMID = {
   height: 280,

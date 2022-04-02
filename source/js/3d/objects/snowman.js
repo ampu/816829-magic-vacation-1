@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {Material} from '3d/materials/materials';
+import {ObjectName} from '3d/constants/object-name';
 
 const SEGMENTS = 32;
 
@@ -52,13 +53,14 @@ const addNose = (parent) => {
 };
 
 export const addSnowman = (parent) => {
-  const snowman = new THREE.Group();
-  snowman.position.set(...SNOWMAN.position);
+  const object = new THREE.Group();
+  object.name = ObjectName.SNOWMAN;
+  object.position.set(...SNOWMAN.position);
 
-  addNose(snowman);
-  addSphere(snowman, Sphere.SMALL);
-  addSphere(snowman, Sphere.BIG);
+  addNose(object);
+  addSphere(object, Sphere.SMALL);
+  addSphere(object, Sphere.BIG);
 
-  parent.add(snowman);
-  return snowman;
+  parent.add(object);
+  return object;
 };

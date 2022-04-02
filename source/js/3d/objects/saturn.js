@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
-import {rotateObjectInDegrees, scaleObjectToFitHeight, squashTorusGeometry} from '3d/helpers/geometry-helpers';
+import {squashTorusGeometry} from '3d/helpers/geometry-helpers';
+import {rotateObjectInDegrees, scaleObjectToFitHeight} from '3d/helpers/object-helpers';
 import {Material} from '3d/materials/materials';
 
 const CIRCLE_SEGMENTS = 32;

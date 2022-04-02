@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {Material} from '3d/materials/materials';
-import {rotateObjectInDegrees} from '3d/helpers/geometry-helpers';
+import {rotateObjectInDegrees} from '3d/helpers/object-helpers';
+import {ObjectName} from '3d/constants/object-name';
 
 const CIRCLE_SEGMENTS = 32;
 const SQUARE_SEGMENTS = 4;
@@ -113,17 +114,18 @@ const addBase = (parent) => {
 };
 
 export const addLamppost = (parent) => {
-  const lamppost = new THREE.Group();
-  lamppost.position.set(...LAMPPOST.position);
-  rotateObjectInDegrees(lamppost, LAMPPOST.rotation);
+  const object = new THREE.Group();
+  object.name = ObjectName.LAMPPOST;
+  object.position.set(...LAMPPOST.position);
+  rotateObjectInDegrees(object, LAMPPOST.rotation);
 
-  addLanternTop(lamppost, BASE.height + JOINT.radius + BODY.height - BODY.yOffset + LANTERN_BOTTOM.height + LANTERN_MIDDLE.height);
-  addLanternMiddle(lamppost, BASE.height + JOINT.radius + BODY.height - BODY.yOffset + LANTERN_BOTTOM.height);
-  addLanternBottom(lamppost, BASE.height + JOINT.radius + BODY.height - BODY.yOffset);
-  addBody(lamppost, BASE.height + JOINT.radius);
-  addJoint(lamppost, BASE.height);
-  addBase(lamppost);
+  addLanternTop(object, BASE.height + JOINT.radius + BODY.height - BODY.yOffset + LANTERN_BOTTOM.height + LANTERN_MIDDLE.height);
+  addLanternMiddle(object, BASE.height + JOINT.radius + BODY.height - BODY.yOffset + LANTERN_BOTTOM.height);
+  addLanternBottom(object, BASE.height + JOINT.radius + BODY.height - BODY.yOffset);
+  addBody(object, BASE.height + JOINT.radius);
+  addJoint(object, BASE.height);
+  addBase(object);
 
-  parent.add(lamppost);
-  return lamppost;
+  parent.add(object);
+  return object;
 };

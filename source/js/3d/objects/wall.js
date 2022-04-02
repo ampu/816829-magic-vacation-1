@@ -1,6 +1,7 @@
 import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader';
 import {Material} from '3d/materials/materials';
-import {rotateObjectInDegrees, scaleObjectToFitSize} from '3d/helpers/geometry-helpers';
+import {rotateObjectInDegrees, scaleObjectToFitSize, setMeshMaterial} from '3d/helpers/object-helpers';
+import {ObjectName} from '3d/constants/object-name';
 
 const WALL_URL = ` ./3d/module-6/rooms-scenes/common/WallCornerUnit.obj`;
 
@@ -39,11 +40,8 @@ const addWall = async (parent, {size, position, rotation, material}) => {
   })
     .then((object) => {
       /** @param {Group} object */
-      object.traverse((child) => {
-        if (child.type === `Mesh`) {
-          child.material = material;
-        }
-      });
+      object.name = ObjectName.WALL;
+      setMeshMaterial(object, material);
       scaleObjectToFitSize(object, size);
       object.position.set(...position);
       rotateObjectInDegrees(object, rotation);

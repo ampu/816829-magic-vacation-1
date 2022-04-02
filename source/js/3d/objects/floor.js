@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {Material} from '3d/materials/materials';
+import {ObjectName} from '3d/constants/object-name';
 
 const FLOOR = {
   rotateX: Math.PI / 2,
@@ -32,6 +33,7 @@ const addFloor = async (parent, {radius, material}) => {
   const geometry = new THREE.CircleGeometry(radius, FLOOR.segments, FLOOR.thetaStart, FLOOR.thetaLength);
 
   const object = new THREE.Mesh(geometry, material);
+  object.name = ObjectName.FLOOR;
   object.rotateX(FLOOR.rotateX);
 
   parent.add(object);

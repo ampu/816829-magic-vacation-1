@@ -1,6 +1,6 @@
 import {loadSVGGroup} from '3d/helpers/svg-helpers';
 import {Material} from '3d/materials/materials';
-import {rotateObjectInDegrees} from '3d/helpers/geometry-helpers';
+import {rotateObjectInDegrees} from '3d/helpers/object-helpers';
 
 const SNOWFLAKE_SVG = {
   url: `./img/svg-forms/snowflake.svg`,

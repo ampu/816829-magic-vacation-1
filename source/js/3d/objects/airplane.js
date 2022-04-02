@@ -1,6 +1,6 @@
 import {OBJLoader} from 'three/examples/jsm/loaders/objloader';
 import {Material} from '3d/materials/materials';
-import {rotateObjectInDegrees, scaleObjectToFitHeight} from '3d/helpers/geometry-helpers';
+import {rotateObjectInDegrees, scaleObjectToFitHeight} from '3d/helpers/object-helpers';
 
 const AIRPLANE = {
   url: `./3d/module-6/scene-0-objects/airplane.obj`,

@@ -1,6 +1,19 @@
 import * as THREE from 'three';
-// eslint-disable-next-line no-unused-vars
 import * as lil from 'lil-gui';
+
+/**
+ * @param {string?} title
+ * @return {lil.GUI}
+ */
+export const getGUI = (title = undefined) => {
+  if (!getGUI.instance) {
+    getGUI.instance = new lil.GUI();
+  }
+  if (title) {
+    getGUI.instance.title(title);
+  }
+  return getGUI.instance;
+};
 
 const createRotationController = (object, property) => {
   const helper = {

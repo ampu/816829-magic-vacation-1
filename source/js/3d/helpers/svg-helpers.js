@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import {SVGLoader} from 'three/examples/jsm/loaders/SVGLoader';
-import {getObjectSize} from '3d/helpers/geometry-helpers';
+import {getObjectSize} from '3d/helpers/object-helpers';
 
 const SCALED_EXTRUDE_OPTIONS = [`depth`, `bevelSize`, `bevelThickness`, `bevelOffset`];
 

@@ -35,9 +35,14 @@ export const addDirectionalLight = (scene, parent, {x, y, z}) => {
 
 export const addPointLight1 = (scene, parent) => {
   const light = new THREE.PointLight(`rgb(246, 242, 255)`, 0.6, 1975, 2.0);
-  light.position.x -= 785;
-  light.position.y -= 350;
-  light.position.z -= 710;
+  light.position.set(-785, -350, -710);
+
+  light.castShadow = true;
+  light.shadow.mapSize.width = 512;
+  light.shadow.mapSize.height = 512;
+  light.shadow.camera.near = 0.5;
+  light.shadow.camera.far = 500;
+
   parent.add(light);
 
   const helper = new THREE.PointLightHelper(light, 50);
@@ -48,9 +53,14 @@ export const addPointLight1 = (scene, parent) => {
 
 export const addPointLight2 = (scene, parent) => {
   const light = new THREE.PointLight(`rgb(245, 254, 255)`, 0.95, 1975, 2.0);
-  light.position.x += 730;
-  light.position.y += 800;
-  light.position.z -= 985;
+  light.position.set(730, 800, -985);
+
+  light.castShadow = true;
+  light.shadow.mapSize.width = 512;
+  light.shadow.mapSize.height = 512;
+  light.shadow.camera.near = 0.5;
+  light.shadow.camera.far = 500;
+
   parent.add(light);
 
   const helper = new THREE.PointLightHelper(light, 50);

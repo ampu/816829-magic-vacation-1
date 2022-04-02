@@ -1,0 +1,15 @@
+export const ObjectName = {
+  SUITCASE: `suitcase`,
+  DOG: `dog`,
+  STATIC: `static`,
+  WALL: `wall`,
+  FLOOR: `floor`,
+  CARPET: `carpet`,
+  ROAD: `road`,
+  LAMPPOST: `lamppost`,
+  SNOWMAN: `snowman`,
+  COMPASS: `compass`,
+  SONYA: `sonya`,
+  HISTORY: `history`,
+  PILLARS: `pillars`,
+};

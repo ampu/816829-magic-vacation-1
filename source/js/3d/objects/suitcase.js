@@ -1,5 +1,8 @@
+import * as THREE from 'three';
 import {GLTFLoader} from 'three/examples/jsm/loaders/gltfloader';
-import {rotateObjectInDegrees, scaleObjectToFitHeight} from '3d/helpers/geometry-helpers';
+import {rotateObjectInDegrees, scaleObjectToFitHeight, setPolarPosition2} from '3d/helpers/object-helpers';
+import {getGUI} from '3d/helpers/gui-helpers';
+import {ObjectName} from '3d/constants/object-name';
 
 const SUITCASE_URL = `./3d/module-6/scene-0-objects/suitcase.gltf`;
 
@@ -9,10 +12,10 @@ const KEYHOLE_SUITCASE = {
   rotation: [20, -140, 15, `XYZ`]
 };
 
-const DOG_SUITCASE = {
+const HISTORY_SUITCASE = {
   height: 220,
-  position: [315, 0, 800],
-  rotation: [0, 20, 0, `XYZ`]
+  polarRadius: 830,
+  startAngle: 20,
 };
 
 const loadSuitcase = () => {
@@ -22,23 +25,37 @@ const loadSuitcase = () => {
   });
 };
 
-const addSuitcase = async (parent, {height, position, rotation}) => {
+const addSuitcase = async (parent, {height}) => {
   const gltf = await loadSuitcase();
 
   /** @param {Group} object */
   const object = gltf.scene;
+  object.name = ObjectName.SUITCASE;
   scaleObjectToFitHeight(object, height);
-  object.position.set(...position);
-  rotateObjectInDegrees(object, rotation);
 
   parent.add(object);
   return object;
 };
 
 export const addKeyholeSuitcase = async (parent) => {
-  return addSuitcase(parent, KEYHOLE_SUITCASE);
+  const object = await addSuitcase(parent, KEYHOLE_SUITCASE);
+  object.position.set(...KEYHOLE_SUITCASE.position);
+  rotateObjectInDegrees(object, KEYHOLE_SUITCASE.rotation);
+  return object;
 };
 
-export const addDogSuitcase = async (parent) => {
-  return addSuitcase(parent, DOG_SUITCASE);
+export const addHistorySuitcase = async (parent, title) => {
+  const object = await addSuitcase(parent, HISTORY_SUITCASE);
+  setPolarPosition2(object, HISTORY_SUITCASE.polarRadius, HISTORY_SUITCASE.startAngle, `z`, `x`);
+
+  const folder = getGUI().addFolder(title);
+  folder.add({
+    get angle() {
+      return Math.round(THREE.MathUtils.radToDeg(object.rotation.y));
+    },
+    set angle(value) {
+      setPolarPosition2(object, HISTORY_SUITCASE.polarRadius, value, `z`, `x`);
+    },
+  }, `angle`, -360, 360, 1);
+  return object;
 };
