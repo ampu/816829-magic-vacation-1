@@ -3,8 +3,9 @@ import * as THREE from 'three';
 import {loadSVGGroup} from '3d/helpers/svg-helpers';
 import {Material} from '3d/materials/materials';
 
-const PLANE_SIZE = 10000;
+const PLANE_SIZE = 3000;
 const Z_OFFSET = -405;
+export const START_ANIMATION_POSITION = [0, 0, Z_OFFSET];
 
 const KEYHOLE = {
   url: `./img/svg-forms/keyhole.svg`,

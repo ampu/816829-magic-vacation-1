@@ -1,7 +1,7 @@
 import {SceneObject} from 'scenes/scene-object';
 import {SceneObjectState} from 'scenes/scene-object-state';
 import {FrameAnimation} from 'helpers/frame-animation';
-import {convertTangentToDegrees, convertDegreesToRadians, createSinusCalculator, createCalculator} from 'helpers/calculator';
+import {convertTangentToDegrees, convertDegreesToRadians, createSineCalculator, createCalculator} from 'helpers/calculator';
 import {ease} from 'helpers/easings';
 
 const HORIZONTAL_PLANE_ROTATE = 47;
@@ -26,7 +26,7 @@ export default new SceneObject({
     userState: {
       getOpacity: createCalculator({xRange: [0, 200]}),
       getTranslateX: createCalculator({yRange: [0, PLANE_MOTION_WIDTH]}),
-      motion: createSinusCalculator({x: -130, y: -10, width: PLANE_MOTION_WIDTH, height: 190, amplitude: 750}),
+      motion: createSineCalculator({x: -130, y: -10, width: PLANE_MOTION_WIDTH, height: 190, amplitude: 750}),
     },
     onRenderFrame({progress, elapsed}, {state, getOpacity, getTranslateX, motion}) {
       state.opacity = getOpacity(elapsed);

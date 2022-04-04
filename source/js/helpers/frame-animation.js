@@ -7,14 +7,21 @@ const MAX_PROGRESS_WITH_ALTERNATION = 2 * MAX_PROGRESS;
 const TIME_ORIGIN = Date.now() - Math.trunc(performance.now());
 
 const calculateElapsed = (currentTimestamp, startTimestamp, delay) => {
-  return (currentTimestamp - (startTimestamp + delay)) * PLAYBACK_RATE;
+  return Math.max(0, (currentTimestamp - (startTimestamp + delay)) * PLAYBACK_RATE);
 };
 
 const calculateProgress = (elapsed, duration, shouldAlternate) => {
   const rawProgress = Math.max(0, elapsed / duration);
-  return shouldAlternate && rawProgress > MAX_PROGRESS
-    ? MAX_PROGRESS_WITH_ALTERNATION - rawProgress % MAX_PROGRESS_WITH_ALTERNATION
-    : Math.min(rawProgress, MAX_PROGRESS);
+  if (!shouldAlternate) {
+    return Math.min(rawProgress, MAX_PROGRESS);
+  }
+  const constraintProgress = rawProgress === MAX_PROGRESS_WITH_ALTERNATION
+    ? MAX_PROGRESS_WITH_ALTERNATION
+    : rawProgress % MAX_PROGRESS_WITH_ALTERNATION;
+
+  return constraintProgress > MAX_PROGRESS
+    ? MAX_PROGRESS_WITH_ALTERNATION - constraintProgress
+    : Math.min(constraintProgress, MAX_PROGRESS);
 };
 
 export const calculateIteration = (elapsed, duration) => {
@@ -32,8 +39,9 @@ const calculateAnimationDuration = (fps, framesCount) => {
 export class FrameAnimation {
   /**
    * @param {string} name
-   * @param {bool} shouldPreloadFirstFrame
-   * @param {bool} shouldAlternate
+   * @param {boolean} shouldPreloadFirstFrame
+   * @param {boolean} shouldAlternate
+   * @param {boolean} shouldSkipDuplicates
    * @param {number} delay
    * @param {number} duration
    * @param {number} fps
@@ -43,9 +51,10 @@ export class FrameAnimation {
    * @param {function} onRenderFrame
    */
   constructor({
-    name = performance.now(),
+    name = String(performance.now()),
     shouldPreloadFirstFrame = true,
     shouldAlternate = false,
+    shouldSkipDuplicates = true,
     delay = 0,
     duration,
     fps = 60,
@@ -58,6 +67,7 @@ export class FrameAnimation {
 
     this._shouldPreloadFirstFrame = shouldPreloadFirstFrame;
     this._shouldAlternate = shouldAlternate;
+    this._shouldSkipDuplicates = shouldSkipDuplicates;
 
     this._delay = delay / PLAYBACK_RATE;
     this._fps = fps;
@@ -76,7 +86,6 @@ export class FrameAnimation {
     this._delayTimer = 0;
     this._startTimestamp = 0;
     this._latestAnimationFrameId = 0;
-    this._onceAnimationFrameId = 0;
     this._latestRenderState = null;
 
     this._userState = userState;
@@ -130,18 +139,20 @@ export class FrameAnimation {
     this._latestAnimationFrameId = requestAnimationFrame(this._onRerenderFrame);
   }
 
-  _onFrame(performanceNow, shouldRequestNextFrameIfNeeded, shouldSkipDuplicate) {
+  _onFrame(performanceNow, shouldRequestNextFrameIfNeeded, shouldSkipDuplicates) {
     const currentTimestamp = TIME_ORIGIN + Math.trunc(performanceNow);
     const elapsed = calculateElapsed(currentTimestamp, this._startTimestamp, this._delay);
     const iteration = calculateIteration(elapsed, this._duration);
     const progress = this._onProgress(calculateProgress(elapsed, this._duration, this._shouldAlternate));
     const renderFrameId = calculateFrameId(this._fps, progress, this._duration);
 
-    if (shouldSkipDuplicate && this._latestRenderState && this._latestRenderState.frameId === renderFrameId) {
-      if (shouldRequestNextFrameIfNeeded) {
-        this._latestAnimationFrameId = requestAnimationFrame(this._onScheduleFrame);
+    if (this._shouldSkipDuplicates && shouldSkipDuplicates) {
+      if (this._latestRenderState && this._latestRenderState.frameId === renderFrameId) {
+        if (shouldRequestNextFrameIfNeeded) {
+          this._latestAnimationFrameId = requestAnimationFrame(this._onScheduleFrame);
+        }
+        return;
       }
-      return;
     }
 
     this._latestRenderState = {

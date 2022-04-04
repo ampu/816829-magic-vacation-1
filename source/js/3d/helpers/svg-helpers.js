@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import {SVGLoader} from 'three/examples/jsm/loaders/SVGLoader';
-import {getObjectSize} from '3d/helpers/object-helpers';
+import {getObjectSize, wrapObject} from '3d/helpers/object-helpers';
 
 const SCALED_EXTRUDE_OPTIONS = [`depth`, `bevelSize`, `bevelThickness`, `bevelOffset`];
 
@@ -41,9 +41,7 @@ export const loadSVGGroup = async ({url, width, height, extrudeOptions, onGetMat
   group.scale.set(scaleX, -scaleY, 1);
   group.position.set(-size.x * scaleX / 2, size.y * scaleY / 2);
 
-  const wrapper = new THREE.Group();
-  wrapper.add(group);
-  return wrapper;
+  return wrapObject(group);
 };
 
 /**

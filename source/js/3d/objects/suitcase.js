@@ -3,6 +3,7 @@ import {GLTFLoader} from 'three/examples/jsm/loaders/gltfloader';
 import {rotateObjectInDegrees, scaleObjectToFitHeight, setPolarPosition2} from '3d/helpers/object-helpers';
 import {getGUI} from '3d/helpers/gui-helpers';
 import {ObjectName} from '3d/constants/object-name';
+import {wrapObject} from '3d/helpers/object-helpers';
 
 const SUITCASE_URL = `./3d/module-6/scene-0-objects/suitcase.gltf`;
 
@@ -33,15 +34,22 @@ const addSuitcase = async (parent, {height}) => {
   object.name = ObjectName.SUITCASE;
   scaleObjectToFitHeight(object, height);
 
-  parent.add(object);
   return object;
 };
 
 export const addKeyholeSuitcase = async (parent) => {
   const object = await addSuitcase(parent, KEYHOLE_SUITCASE);
-  object.position.set(...KEYHOLE_SUITCASE.position);
   rotateObjectInDegrees(object, KEYHOLE_SUITCASE.rotation);
-  return object;
+
+  const wrapper = wrapObject(object);
+  wrapper.position.set(...KEYHOLE_SUITCASE.position);
+
+  parent.add(wrapper);
+  return {
+    object: wrapper,
+    onRenderFrame() {
+    },
+  };
 };
 
 export const addHistorySuitcase = async (parent, title) => {
@@ -57,5 +65,7 @@ export const addHistorySuitcase = async (parent, title) => {
       setPolarPosition2(object, HISTORY_SUITCASE.polarRadius, value, `z`, `x`);
     },
   }, `angle`, -360, 360, 1);
+
+  parent.add(object);
   return object;
 };

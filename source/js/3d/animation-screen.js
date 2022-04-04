@@ -6,7 +6,7 @@ import CustomMaterial from './materials/custom-material';
 import TextureMaterial from './materials/texture-material';
 import {SLIDES, addSlideChangeListener} from 'modules/slider';
 import {FrameAnimation, calculateIteration} from 'helpers/frame-animation';
-import {NamedCalculator, createCalculator, createFadingSinusCalculator} from 'helpers/calculator';
+import {NamedCalculator, createCalculator, createFadingSineCalculator} from 'helpers/calculator';
 
 const INTRO_TEXTURE_URL = `./img/scenes-textures/scene-0.png`;
 const INTRO_TEXTURE_HUE_ROTATION = 0;
@@ -123,21 +123,21 @@ export default () => {
 
   const bubbleCalculators = [
     {
-      getX: createFadingSinusCalculator({x: 2 / 3, y: 0.4, width: 3, height: 0.2, amplitude: 1, fadingRatio: 1}).calculateY,
+      getX: createFadingSineCalculator({x: 2 / 3, y: 0.4, width: 3, height: 0.2, amplitude: 1, fadingRatio: 1}).calculateY,
       getY: createCalculator({
         xRange: [Bubble.FIRST.delay, Bubble.FIRST.delay + 1800],
         yRange: [0 - Bubble.FIRST.radius, 1 + Bubble.FIRST.radius],
       }),
     },
     {
-      getX: createFadingSinusCalculator({x: 1 / 3, y: 0.25, width: 3, height: 0.1, amplitude: 1, fadingRatio: 1}).calculateY,
+      getX: createFadingSineCalculator({x: 1 / 3, y: 0.25, width: 3, height: 0.1, amplitude: 1, fadingRatio: 1}).calculateY,
       getY: createCalculator({
         xRange: [Bubble.SECOND.delay, Bubble.SECOND.delay + 1800],
         yRange: [0 - Bubble.SECOND.radius, 1 + Bubble.SECOND.radius],
       }),
     },
     {
-      getX: createFadingSinusCalculator({x: 0, y: 0.48, width: 3, height: 0.05, amplitude: 1, fadingRatio: 1}).calculateY,
+      getX: createFadingSineCalculator({x: 0, y: 0.48, width: 3, height: 0.05, amplitude: 1, fadingRatio: 1}).calculateY,
       getY: createCalculator({
         xRange: [Bubble.THIRD.delay, Bubble.THIRD.delay + 1800],
         yRange: [0 - Bubble.THIRD.radius, 1 + Bubble.THIRD.radius],

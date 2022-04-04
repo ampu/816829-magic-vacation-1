@@ -1,16 +1,13 @@
 import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 
+import {ObjectName} from '3d/constants/object-name';
 import {containSize} from 'helpers/document-helpers';
 import {StateStorage} from 'helpers/state-storage';
 
 import {addDirectionalLight, addHemisphereLight, addLightGroup, addPointLight1, addPointLight2} from './lights/lights';
-import {addDogScene} from './scenes/dog-scene';
-import {addPyramidScene} from './scenes/pyramid-scene';
-import {addCompassScene} from './scenes/compass-scene';
-import {addSonyaScene} from './scenes/sonya-scene';
+import {addKeyholeScene} from '3d/scenes/keyhole-scene';
 import {getGUI} from '3d/helpers/gui-helpers';
-import {ObjectName} from '3d/constants/object-name';
 
 const ShadowsRequirement = {
   SCREEN_WIDTH: 1024,
@@ -18,7 +15,8 @@ const ShadowsRequirement = {
 };
 
 const PLANE_SIZE = [2048, 1024];
-const DEFAULT_CAMERA_POSITION = {x: Math.sqrt(2550 ** 2 / 2), y: 800, z: Math.sqrt(2550 ** 2 / 2)};
+// const DEFAULT_CAMERA_POSITION = {x: Math.sqrt(2550 ** 2 / 2), y: 800, z: Math.sqrt(2550 ** 2 / 2)};
+const DEFAULT_CAMERA_POSITION = {x: 0, y: 0, z: 1000};
 
 const cameraPositionStorage = new StateStorage(sessionStorage, `camera-position`);
 const currentHistorySceneIndexStorage = new StateStorage(sessionStorage, `current-history-scene-index`);
@@ -66,6 +64,7 @@ const createScene = ({
   camera.lookAt(0, 0, 0);
 
   scene.add(new THREE.AxesHelper(2000));
+
   scene.add(new THREE.GridHelper(2000));
 
   const yGrid = new THREE.GridHelper(2000);
@@ -113,6 +112,7 @@ export default () => {
   });
 
   let orbit = addOrbit(renderer, camera);
+  let shouldResizeScene = false;
 
   const lightGroup = addLightGroup(mainScene, DEFAULT_CAMERA_POSITION);
   addHemisphereLight(mainScene, lightGroup, DEFAULT_CAMERA_POSITION);
@@ -124,7 +124,7 @@ export default () => {
   const setCurrentHistorySceneIndex = (value) => {
     currentHistorySceneIndex = (value + 4) % 4;
     history.rotation.y = -currentHistorySceneIndex * Math.PI / 2;
-    sceneController.updateDisplay();
+    // sceneController.updateDisplay();
     currentHistorySceneIndexStorage.setState(currentHistorySceneIndex);
   };
 
@@ -133,42 +133,47 @@ export default () => {
   history.rotation.y = -currentHistorySceneIndex * Math.PI / 2;
 
   mainScene.add(history);
-  addDogScene(history, 0 * Math.PI / 2);
-  addPyramidScene(history, 1 * Math.PI / 2);
-  addCompassScene(history, 2 * Math.PI / 2);
-  addSonyaScene(history, 3 * Math.PI / 2);
+  // addDogScene(history, 0 * Math.PI / 2);
+  // addPyramidScene(history, 1 * Math.PI / 2);
+  // addCompassScene(history, 2 * Math.PI / 2);
+  // addSonyaScene(history, 3 * Math.PI / 2);
 
-  const gui = getGUI(`Press &lt;TAB> to switch scene`);
-  const sceneController = gui.add({
-    get scene() {
-      return currentHistorySceneIndex;
-    },
-    set scene(value) {
-      setCurrentHistorySceneIndex(value);
-    },
-  }, `scene`, {
-    [`Dog`]: 0,
-    [`Pyramid`]: 1,
-    [`Compass`]: 2,
-    [`Sonya`]: 3,
-  });
+  addKeyholeScene(mainScene)
+    .then(({animation}) => {
+      animation.start();
+    });
+
+  // const gui = getGUI(`Press &lt;TAB> to switch scene`);
+  // const sceneController = gui.add({
+  //   get scene() {
+  //     return currentHistorySceneIndex;
+  //   },
+  //   set scene(value) {
+  //     setCurrentHistorySceneIndex(value);
+  //   },
+  // }, `scene`, {
+  //   [`Dog`]: 0,
+  //   [`Pyramid`]: 1,
+  //   [`Compass`]: 2,
+  //   [`Sonya`]: 3,
+  // });
 
   window.addEventListener(`resize`, () => {
-    resizeScene({
-      renderer,
-      scene: mainScene,
-      camera,
-      width: animationScreen.clientWidth,
-      height: animationScreen.clientHeight,
-    });
+    shouldResizeScene = true;
   });
 
   document.addEventListener(`keydown`, (evt) => {
     if (evt.key === `Escape`) {
       camera.position.copy(DEFAULT_CAMERA_POSITION);
+      camera.rotation.set(0, 0, 0);
       setCurrentHistorySceneIndex(0);
+
       orbit.dispose();
       orbit = addOrbit(renderer, camera);
+
+      getGUI().controllersRecursive().forEach((controller) => {
+        controller.reset();
+      });
       return;
     }
     if (evt.key === `Tab`) {
@@ -182,6 +187,16 @@ export default () => {
     if (typeof tickFpsCounter !== `undefined`) {
       /* eslint-disable-next-line no-undef */
       tickFpsCounter(performanceNow);
+    }
+    if (shouldResizeScene) {
+      resizeScene({
+        renderer,
+        scene: mainScene,
+        camera,
+        width: animationScreen.clientWidth,
+        height: animationScreen.clientHeight,
+      });
+      shouldResizeScene = false;
     }
     cameraPositionStorage.setState(camera.position);
     renderer.render(mainScene, camera);

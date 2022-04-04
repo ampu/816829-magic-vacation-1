@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 
 import {squashTorusGeometry} from '3d/helpers/geometry-helpers';
-import {rotateObjectInDegrees, scaleObjectToFitHeight} from '3d/helpers/object-helpers';
+import {rotateObjectInDegrees, scaleObjectToFitHeight, wrapObject} from '3d/helpers/object-helpers';
 import {Material} from '3d/materials/materials';
+import {createRotationCalculator} from 'helpers/calculator';
 
 const CIRCLE_SEGMENTS = 32;
 const LINE_SEGMENTS = 1;
@@ -75,7 +76,7 @@ const addRing = (parent, material) => {
   return object;
 };
 
-const addSaturn = (parent, shouldRenderPendant, redMaterial, purpleMaterial) => {
+const loadSaturn = (shouldRenderPendant, redMaterial, purpleMaterial) => {
   const saturn = new THREE.Group();
 
   if (shouldRenderPendant) {
@@ -85,28 +86,41 @@ const addSaturn = (parent, shouldRenderPendant, redMaterial, purpleMaterial) => 
   const bigPlanet = addBigPlanet(saturn, redMaterial);
   addRing(bigPlanet, purpleMaterial);
 
-  parent.add(saturn);
   return saturn;
 };
 
 export const addDogSaturn = (parent) => {
-  const object = addSaturn(parent, true, Material.SOFT_DOMINANT_RED, Material.SOFT_BRIGHT_PURPLE);
+  const object = loadSaturn(true, Material.SOFT_DOMINANT_RED, Material.SOFT_BRIGHT_PURPLE);
   object.position.set(...DOG_SATURN.position);
   rotateObjectInDegrees(object, SONYA_SATURN.rotation);
+
+  parent.add(object);
   return object;
 };
 
 export const addSonyaSaturn = (parent) => {
-  const object = addSaturn(parent, false, Material.SOFT_SHADOWED_DOMINANT_RED, Material.SOFT_SHADOWED_BRIGHT_PURPLE);
+  const object = loadSaturn(false, Material.SOFT_SHADOWED_DOMINANT_RED, Material.SOFT_SHADOWED_BRIGHT_PURPLE);
   object.position.set(...SONYA_SATURN.position);
   rotateObjectInDegrees(object, SONYA_SATURN.rotation);
+
+  parent.add(object);
   return object;
 };
 
 export const addKeyholeSaturn = (parent) => {
-  const object = addSaturn(parent, false, Material.SOFT_SHADOWED_DOMINANT_RED, Material.SOFT_SHADOWED_BRIGHT_PURPLE);
+  const object = loadSaturn(false, Material.SOFT_DOMINANT_RED, Material.SOFT_SHADOWED_BRIGHT_PURPLE);
   scaleObjectToFitHeight(object, KEYHOLE_SATURN.height);
-  object.position.set(...KEYHOLE_SATURN.position);
   rotateObjectInDegrees(object, KEYHOLE_SATURN.rotation);
-  return object;
+
+  const wrapper = wrapObject(object);
+  wrapper.position.set(...KEYHOLE_SATURN.position);
+  parent.add(wrapper);
+
+  const getRotation = createRotationCalculator({yRange: [[0, -30, -110], [0, 0, 0]]});
+  return {
+    object: wrapper,
+    onRenderFrame({progress}) {
+      wrapper.rotation.set(...getRotation(progress));
+    },
+  };
 };

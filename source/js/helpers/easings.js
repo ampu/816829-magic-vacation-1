@@ -13,7 +13,7 @@ export const easeInElastic = (x) => x === 0 || x === 1 ? x : 2 ** (10 * x - 10) 
 
 export const easeOutQuad = (x) => 1 - (1 - x) ** 2;
 export const easeOutCubic = (x) => 1 - (1 - x) ** 3;
-export const easeOutExpo = (x) => x === 1 ? x : 1 - 2 ** (-10 * x);
+export const easeOutExpo = (x) => 1 - 2 ** (-10 * x);
 export const easeOutElastic = (x) => x === 0 || x === 1 ? x : 2 ** (-10 * x) * sin(x * 10 - 0.75) * 2 * PI / 3 + 1;
 
 export const createPower = (power) => (x) => x ** power;

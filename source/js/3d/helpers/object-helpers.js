@@ -98,3 +98,17 @@ export const receiveShadow = (parentObject, childNames) => {
     mesh.receiveShadow = true;
   });
 };
+
+/**
+ * @param {Object3D} object
+ * @return {Group}
+ */
+export const wrapObject = (object) => {
+  const parent = object.parent;
+  const wrapper = new THREE.Group();
+  wrapper.add(object);
+  if (parent) {
+    parent.add(wrapper);
+  }
+  return wrapper;
+};
