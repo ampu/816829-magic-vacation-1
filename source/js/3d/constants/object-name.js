@@ -1,6 +1,5 @@
 export const ObjectName = {
   SUITCASE: `suitcase`,
-  DOG: `dog`,
   STATIC: `static`,
   WALL: `wall`,
   FLOOR: `floor`,
@@ -8,8 +7,19 @@ export const ObjectName = {
   ROAD: `road`,
   LAMPPOST: `lamppost`,
   SNOWMAN: `snowman`,
-  COMPASS: `compass`,
-  SONYA: `sonya`,
   HISTORY: `history`,
   PILLARS: `pillars`,
+
+  DOG: `dog`,
+  DOG_TAIL: `Tail`,
+
+  COMPASS: `compass`,
+  COMPASS_ARROW_CENTER: `ArrowCenter`,
+
+  SONYA: `sonya`,
+  SONYA_RIGHT_HAND: `RightHand`,
+  SONYA_LEFT_HAND: `LeftHand`,
+
+  BIG_LEAF: `big-leaf`,
+  SMALL_LEAF: `small-leaf`,
 };

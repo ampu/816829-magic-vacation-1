@@ -17,14 +17,16 @@ export const addDogScene = async (parent, yRotation) => {
 
   const [
     suitcase,
+    dog,
+    saturn,
   ] = await Promise.all([
     addHistorySuitcase(scene, `Dog suitcase`),
-    addDogCarpet(scene),
+    addDog(scene),
     addDogSaturn(scene),
+    addDogCarpet(scene),
     addDogWall(scene),
     addDogFloor(scene),
     addDogStatic(scene),
-    addDog(scene),
   ]);
 
   receiveShadow(scene, [
@@ -44,6 +46,8 @@ export const addDogScene = async (parent, yRotation) => {
     scene,
     animation: new CompositeAnimation([
       suitcase.animation,
+      dog.animation,
+      saturn.animation,
     ]),
   };
 };

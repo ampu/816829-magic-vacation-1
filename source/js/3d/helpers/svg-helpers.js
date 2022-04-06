@@ -17,9 +17,17 @@ const createDefaultMaterial = (color) => new THREE.MeshStandardMaterial({
  * @param {number} height
  * @param {object} extrudeOptions
  * @param {function(color): THREE.Material} onGetMaterial
+ * @param {boolean} shouldCenterAxes
  * @return {Promise<Group>}
  */
-export const loadSVGGroup = async ({url, width, height, extrudeOptions, onGetMaterial}) => {
+export const loadSVGGroup = async ({
+  url,
+  width,
+  height,
+  extrudeOptions,
+  onGetMaterial,
+  shouldCenterAxes = true,
+}) => {
   const svg = await loadSVG(url);
 
   const size = getPathsSize(svg.paths);
@@ -39,7 +47,9 @@ export const loadSVGGroup = async ({url, width, height, extrudeOptions, onGetMat
 
   const group = convertPathsToGroup(svg.paths, extrudeOptions, onGetMaterial);
   group.scale.set(scaleX, -scaleY, 1);
-  group.position.set(-size.x * scaleX / 2, size.y * scaleY / 2);
+  if (shouldCenterAxes) {
+    group.position.set(-size.x * scaleX / 2, size.y * scaleY / 2);
+  }
 
   return wrapObject(group);
 };

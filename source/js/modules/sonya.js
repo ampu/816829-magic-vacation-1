@@ -37,7 +37,7 @@ export default () => {
     ], {
       fill: `both`,
       delay: 2900, // 0:47.8
-      duration: 900,
+      iterationDuration: 900,
       easing: `ease-out`,
     });
 
@@ -61,7 +61,7 @@ export default () => {
       fill: `both`,
       direction: `alternate`,
       delay: 300, // 49.0
-      duration: 1000,
+      iterationDuration: 1000,
       iterations: Infinity,
       easing: `ease-in-out`,
     });

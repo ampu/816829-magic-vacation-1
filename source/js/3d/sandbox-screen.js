@@ -4,10 +4,13 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import {ObjectName} from '3d/constants/object-name';
 import {containSize} from 'helpers/document-helpers';
 import {StateStorage} from 'helpers/state-storage';
+import {getGUI} from '3d/helpers/gui-helpers';
 
 import {addDirectionalLight, addHemisphereLight, addLightGroup, addPointLight1, addPointLight2} from './lights/lights';
 import {addDogScene} from '3d/scenes/dog-scene';
-import {getGUI} from '3d/helpers/gui-helpers';
+import {addPyramidScene} from '3d/scenes/pyramid-scene';
+import {addCompassScene} from '3d/scenes/compass-scene';
+import {addSonyaScene} from '3d/scenes/sonya-scene';
 
 const ShadowsRequirement = {
   SCREEN_WIDTH: 1024,
@@ -124,7 +127,7 @@ export default () => {
   const setCurrentHistorySceneIndex = (value) => {
     currentHistorySceneIndex = (value + 4) % 4;
     history.rotation.y = -currentHistorySceneIndex * Math.PI / 2;
-    // sceneController.updateDisplay();
+    sceneController.updateDisplay();
     currentHistorySceneIndexStorage.setState(currentHistorySceneIndex);
   };
 
@@ -134,25 +137,25 @@ export default () => {
 
   mainScene.add(history);
   addDogScene(history, 0 * Math.PI / 2).then(({animation}) => animation.start());
-  // addPyramidScene(history, 1 * Math.PI / 2);
-  // addCompassScene(history, 2 * Math.PI / 2);
-  // addSonyaScene(history, 3 * Math.PI / 2);
+  addPyramidScene(history, 1 * Math.PI / 2).then(({animation}) => animation.start());
+  addCompassScene(history, 2 * Math.PI / 2).then(({animation}) => animation.start());
+  addSonyaScene(history, 3 * Math.PI / 2).then(({animation}) => animation.start());
   // addKeyholeScene(mainScene).then(({animation}) => animation.start());
 
-  // const gui = getGUI(`Press &lt;TAB> to switch scene`);
-  // const sceneController = gui.add({
-  //   get scene() {
-  //     return currentHistorySceneIndex;
-  //   },
-  //   set scene(value) {
-  //     setCurrentHistorySceneIndex(value);
-  //   },
-  // }, `scene`, {
-  //   [`Dog`]: 0,
-  //   [`Pyramid`]: 1,
-  //   [`Compass`]: 2,
-  //   [`Sonya`]: 3,
-  // });
+  const gui = getGUI(`Press &lt;TAB> to switch scene`);
+  const sceneController = gui.add({
+    get scene() {
+      return currentHistorySceneIndex;
+    },
+    set scene(value) {
+      setCurrentHistorySceneIndex(value);
+    },
+  }, `scene`, {
+    [`Dog`]: 0,
+    [`Pyramid`]: 1,
+    [`Compass`]: 2,
+    [`Sonya`]: 3,
+  });
 
   window.addEventListener(`resize`, () => {
     shouldResizeScene = true;
@@ -162,7 +165,6 @@ export default () => {
     if (evt.key === `Escape`) {
       camera.position.copy(DEFAULT_CAMERA_POSITION);
       camera.rotation.set(0, 0, 0);
-      setCurrentHistorySceneIndex(0);
 
       orbit.dispose();
       orbit = addOrbit(renderer, camera);
@@ -170,6 +172,8 @@ export default () => {
       getGUI().controllersRecursive().forEach((controller) => {
         controller.reset();
       });
+
+      setCurrentHistorySceneIndex(currentHistorySceneIndex);
       return;
     }
     if (evt.key === `Tab`) {

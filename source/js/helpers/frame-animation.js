@@ -28,6 +28,10 @@ export const calculateIteration = (elapsed, duration) => {
   return Math.max(0, Math.floor(elapsed / duration));
 };
 
+export const calculateIterationProgress = (elapsed, duration) => {
+  return elapsed % duration / duration;
+};
+
 const calculateFrameId = (fps, progress, duration) => {
   return Math.trunc(progress * duration / MILLISECONDS_IN_SECOND * fps);
 };

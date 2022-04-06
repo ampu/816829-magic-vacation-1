@@ -60,3 +60,9 @@ export const easeIn = createBezierEasing(0.42, 0, 1, 1);
 export const easeOut = createBezierEasing(0, 0, 0.58, 1);
 export const easeInOut = createBezierEasing(0.42, 0, 0.58, 1);
 export const easeOutIn = convertToEaseOutIn(easeIn);
+
+export const easeInOutSine = createBezierEasing(0.37, 0, 0.63, 1);
+
+export const easeSine = (value, onEase) => {
+  return onEase((value + 1) / 2) * 2 - 1;
+};

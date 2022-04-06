@@ -8,19 +8,22 @@ import {addSonyaStatic} from '3d/objects/sonya-static';
 import {addSonya} from '3d/objects/sonya';
 import {castShadow, receiveShadow} from '3d/helpers/object-helpers';
 import {ObjectName} from '3d/constants/object-name';
+import {CompositeAnimation} from 'helpers/composite-animation';
 
 export const addSonyaScene = async (parent, yRotation) => {
   const scene = new THREE.Group();
   scene.rotateY(yRotation);
 
-  await Promise.all([
+  const [
+    sonya,
+  ] = await Promise.all([
+    addSonya(scene),
     addSonyaCarpet(scene),
     addHistorySuitcase(scene, `Sonya Suitcase`),
     addSonyaSaturn(scene),
     addSonyaWall(scene),
     addSonyaFloor(scene),
     addSonyaStatic(scene),
-    addSonya(scene),
   ]);
 
   receiveShadow(scene, [
@@ -37,5 +40,10 @@ export const addSonyaScene = async (parent, yRotation) => {
   ]);
 
   parent.add(scene);
-  return scene;
+  return {
+    scene,
+    animation: new CompositeAnimation([
+      sonya.animation,
+    ]),
+  };
 };

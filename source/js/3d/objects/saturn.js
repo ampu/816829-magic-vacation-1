@@ -1,9 +1,11 @@
 import * as THREE from 'three';
 
+import {Material} from '3d/materials/materials';
 import {squashTorusGeometry} from '3d/helpers/geometry-helpers';
 import {rotateObjectInDegrees, scaleObjectToFitHeight, wrapObject} from '3d/helpers/object-helpers';
-import {Material} from '3d/materials/materials';
-import {createRotationCalculator} from 'helpers/calculator';
+
+import {createRotationCalculator, createSineCalculator} from 'helpers/calculator';
+import {FrameAnimation} from 'helpers/frame-animation';
 
 const CIRCLE_SEGMENTS = 32;
 const LINE_SEGMENTS = 1;
@@ -19,18 +21,19 @@ const RING_ANGLE = 18;
 const RING_HEIGHT = 2;
 
 const DOG_SATURN = {
-  position: [200, 450, 200],
+  position: [365, 515 + PENDANT_HEIGHT, 200],
   rotation: [-2, 90, 0, `XYZ`],
+  rotationIterationDuration: 3600,
 };
 
 const SONYA_SATURN = {
-  position: [200, 450, 200],
+  position: [200, 450 + PENDANT_HEIGHT, 200],
   rotation: [-2, 90, 0, `XYZ`],
 };
 
 const KEYHOLE_SATURN = {
   height: 65,
-  position: [335, -111, 100],
+  position: [335, -111 + PENDANT_HEIGHT, 100],
   rotation: [20, -25, 10, `XYZ`],
 };
 
@@ -38,7 +41,7 @@ const addPendant = (parent) => {
   const geometry = new THREE.CylinderGeometry(PENDANT_RADIUS, PENDANT_RADIUS, PENDANT_HEIGHT, CIRCLE_SEGMENTS, LINE_SEGMENTS);
 
   const object = new THREE.Mesh(geometry, Material.SOFT_METAL_GREY);
-  object.position.y = PENDANT_HEIGHT / 2;
+  object.position.y = -PENDANT_HEIGHT / 2;
 
   parent.add(object);
   return object;
@@ -48,7 +51,7 @@ const addSmallPlanet = (parent, material) => {
   const geometry = new THREE.SphereGeometry(SMALL_PLANET_RADIUS, CIRCLE_SEGMENTS, CIRCLE_SEGMENTS);
 
   const object = new THREE.Mesh(geometry, material);
-  object.position.y = 100;
+  object.position.y = 100 - PENDANT_HEIGHT;
 
   parent.add(object);
   return object;
@@ -58,6 +61,7 @@ const addBigPlanet = (parent, material) => {
   const geometry = new THREE.SphereGeometry(BIG_PLANET_RADIUS, CIRCLE_SEGMENTS, CIRCLE_SEGMENTS);
 
   const object = new THREE.Mesh(geometry, material);
+  object.position.y = -PENDANT_HEIGHT;
 
   parent.add(object);
   return object;
@@ -86,20 +90,39 @@ const loadSaturn = (shouldRenderPendant, redMaterial, purpleMaterial) => {
   const bigPlanet = addBigPlanet(saturn, redMaterial);
   addRing(bigPlanet, purpleMaterial);
 
-  return saturn;
+  return {
+    saturn,
+    bigPlanet,
+  };
 };
 
 export const addDogSaturn = (parent) => {
-  const object = loadSaturn(true, Material.SOFT_DOMINANT_RED, Material.SOFT_BRIGHT_PURPLE);
-  object.position.set(...DOG_SATURN.position);
-  rotateObjectInDegrees(object, SONYA_SATURN.rotation);
+  const {saturn, bigPlanet} = loadSaturn(true, Material.SOFT_DOMINANT_RED, Material.SOFT_BRIGHT_PURPLE);
+  rotateObjectInDegrees(saturn, SONYA_SATURN.rotation);
 
-  parent.add(object);
-  return object;
+  const saturnWrapper = wrapObject(saturn);
+  saturnWrapper.position.set(...DOG_SATURN.position);
+
+  const rotationCalculator = createSineCalculator({amplitude: DOG_SATURN.rotationIterationDuration});
+
+  parent.add(saturnWrapper);
+  return {
+    object: saturnWrapper,
+    animation: new FrameAnimation({
+      delay: 2200,
+      duration: Infinity,
+      onRenderFrame({elapsed}) {
+        saturnWrapper.rotation.x = saturnWrapper.rotation.z = -THREE.MathUtils.degToRad(rotationCalculator.calculateY(elapsed));
+
+        bigPlanet.rotation.z = THREE.MathUtils.degToRad(2 * rotationCalculator.calculateY(elapsed + DOG_SATURN.rotationIterationDuration / 2));
+        bigPlanet.rotation.x = -bigPlanet.rotation.z;
+      },
+    })
+  };
 };
 
 export const addSonyaSaturn = (parent) => {
-  const object = loadSaturn(false, Material.SOFT_SHADOWED_DOMINANT_RED, Material.SOFT_SHADOWED_BRIGHT_PURPLE);
+  const {saturn: object} = loadSaturn(false, Material.SOFT_SHADOWED_DOMINANT_RED, Material.SOFT_SHADOWED_BRIGHT_PURPLE);
   object.position.set(...SONYA_SATURN.position);
   rotateObjectInDegrees(object, SONYA_SATURN.rotation);
 
@@ -108,7 +131,7 @@ export const addSonyaSaturn = (parent) => {
 };
 
 export const addKeyholeSaturn = (parent) => {
-  const object = loadSaturn(false, Material.SOFT_DOMINANT_RED, Material.SOFT_SHADOWED_BRIGHT_PURPLE);
+  const {saturn: object} = loadSaturn(false, Material.SOFT_DOMINANT_RED, Material.SOFT_SHADOWED_BRIGHT_PURPLE);
   scaleObjectToFitHeight(object, KEYHOLE_SATURN.height);
   rotateObjectInDegrees(object, KEYHOLE_SATURN.rotation);
 

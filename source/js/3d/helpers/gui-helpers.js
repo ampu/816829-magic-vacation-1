@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import * as lil from 'lil-gui';
 
+const NOOP = () => {
+};
+
 /**
  * @param {string?} title
  * @return {lil.GUI}
@@ -15,6 +18,11 @@ export const getGUI = (title = undefined) => {
   return getGUI.instance;
 };
 
+/**
+ * @param {Object3D} object
+ * @param {string} property
+ * @return {[object,string,number,number,number]}
+ */
 const createRotationController = (object, property) => {
   const helper = {
     get [property]() {
@@ -30,11 +38,23 @@ const createRotationController = (object, property) => {
 /**
  * @param {lil.GUI} gui
  * @param {Object3D} object
+ * @param {function} onChange
  */
-export const addRotationGUI = (gui, object) => {
+export const addRotationGUI = (gui, object, onChange = NOOP) => {
   const rotation = gui.addFolder(`rotation`);
-  rotation.add(...createRotationController(object.rotation, `x`));
-  rotation.add(...createRotationController(object.rotation, `y`));
-  rotation.add(...createRotationController(object.rotation, `z`));
+  const controllers = [
+    rotation.add(...createRotationController(object.rotation, `x`)),
+    rotation.add(...createRotationController(object.rotation, `y`)),
+    rotation.add(...createRotationController(object.rotation, `z`)),
+  ];
+  const onChangeWithUpdate = () => {
+    onChange();
+    for (const controller of controllers) {
+      controller.updateDisplay();
+    }
+  };
+  for (const controller of controllers) {
+    controller.onChange(onChangeWithUpdate);
+  }
   gui.add(object.rotation, `order`, [`XYZ`, `XZY`, `YXZ`, `YZX`, `ZXY`, `ZYX`]);
 };

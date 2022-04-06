@@ -22,7 +22,7 @@ export const getObjectSize = (object) => {
 export const scaleObjectToFitHeight = (object, height, currentSize = getObjectSize(object)) => {
   const scale = height / currentSize.y;
   object.scale.set(scale, scale, scale);
-  return currentSize.clone().multiply(scale);
+  return currentSize.clone().multiplyScalar(scale);
 };
 
 export const scaleObjectToFitSize = (object, [x, y, z], currentSize = getObjectSize(object)) => {

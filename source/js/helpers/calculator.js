@@ -166,7 +166,7 @@ export const createCompositeCalculator = (ranges) => {
  *   calculateTangent: (function(progress: number): number),
  * }}
  */
-export const createSineCalculator = ({x = 0, y = 0, width = 1, height = 2, amplitude = 2 * PI}) => {
+export const createSineCalculator = ({x = 0, y = 0, width = 1, height = 2, amplitude = 1} = {}) => {
   const ratio = 2 * PI / amplitude;
   return {
     calculateY: (progress) => height / 2 * sin(ratio * (width * progress + x)) + y,
@@ -200,9 +200,31 @@ export const createPhaseShiftSineCalculator = ({height = 2, amplitude = 1, phase
  *   calculateY: (function(progress: number): number),
  * }}
  */
-export const createFadingSineCalculator = ({x = 0, y = 0, width = 1, height = 2, amplitude = 2 * PI, fadingRatio = 1}) => {
+export const createFadingSineCalculator = ({x = 0, y = 0, width = 1, height = 2, amplitude = 1, fadingRatio = 1} = {}) => {
   const ratio = 2 * PI / amplitude;
   return {
-    calculateY: (progress) => height / 2 * pow(E, -fadingRatio * progress) * sin(ratio * (width * progress + x)) + y,
+    calculateY: (progress) => height / 2 * pow(E, -fadingRatio * progress / amplitude) * sin(ratio * (width * progress + x)) + y,
   };
+};
+
+/**
+ * @param {CalculatorRange} range
+ * @param {number} multiplier
+ * @return {CalculatorRange}
+ */
+export const multiplyRange = ({xRange, yRange, onProgress}, multiplier) => {
+  return {
+    xRange: xRange.map((value) => value * multiplier),
+    yRange,
+    onProgress,
+  };
+};
+
+/**
+ * @param {CalculatorRange[]} ranges
+ * @param {number} multiplier
+ * @return {CalculatorRange[]}
+ */
+export const multiplyRanges = (ranges, multiplier) => {
+  return ranges.map((range) => multiplyRange(range, multiplier));
 };
