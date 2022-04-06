@@ -1,12 +1,13 @@
 import * as THREE from 'three';
 
 import {CompositeAnimation} from 'helpers/composite-animation';
-import {createPhaseShiftSineCalculator, createVectorCalculator} from 'helpers/calculator';
 import {FrameAnimation} from 'helpers/frame-animation';
+import {createPhaseShiftSineCalculator, createVectorCalculator} from 'helpers/calculator';
 import {easeOutExpo, easeInOut} from 'helpers/easings';
-import {START_ANIMATION_POSITION} from '3d/objects/keyhole';
+import {wrapObject} from '3d/helpers/object-helpers';
+import {generateIntegerByConstraint} from 'helpers/random-helpers';
 
-import {addKeyhole} from '3d/objects/keyhole';
+import {addKeyhole, START_ANIMATION_POSITION} from '3d/objects/keyhole';
 import {addFlamingo} from '3d/objects/flamingo';
 import {addSnowflake} from '3d/objects/snowflake';
 import {addWatermelon} from '3d/objects/watermelon';
@@ -15,8 +16,6 @@ import {addAirplane} from '3d/objects/airplane';
 import {addQuestion} from '3d/objects/question';
 import {addKeyholeSaturn} from '3d/objects/saturn';
 import {addKeyholeLeaf} from '3d/objects/leaf';
-import {wrapObject} from '3d/helpers/object-helpers';
-import {generateIntegerByConstraint} from 'helpers/random-helpers';
 
 const ANIMATION_DELAY = 1400;
 const ANIMATION_DURATION = 1200;

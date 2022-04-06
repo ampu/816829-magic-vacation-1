@@ -6,7 +6,7 @@ import {containSize} from 'helpers/document-helpers';
 import {StateStorage} from 'helpers/state-storage';
 
 import {addDirectionalLight, addHemisphereLight, addLightGroup, addPointLight1, addPointLight2} from './lights/lights';
-import {addKeyholeScene} from '3d/scenes/keyhole-scene';
+import {addDogScene} from '3d/scenes/dog-scene';
 import {getGUI} from '3d/helpers/gui-helpers';
 
 const ShadowsRequirement = {
@@ -15,8 +15,8 @@ const ShadowsRequirement = {
 };
 
 const PLANE_SIZE = [2048, 1024];
-// const DEFAULT_CAMERA_POSITION = {x: Math.sqrt(2550 ** 2 / 2), y: 800, z: Math.sqrt(2550 ** 2 / 2)};
-const DEFAULT_CAMERA_POSITION = {x: 0, y: 0, z: 1000};
+const DEFAULT_CAMERA_POSITION = {x: Math.sqrt(2550 ** 2 / 2), y: 800, z: Math.sqrt(2550 ** 2 / 2)};
+// const DEFAULT_CAMERA_POSITION = {x: 0, y: 0, z: 1000};
 
 const cameraPositionStorage = new StateStorage(sessionStorage, `camera-position`);
 const currentHistorySceneIndexStorage = new StateStorage(sessionStorage, `current-history-scene-index`);
@@ -133,15 +133,11 @@ export default () => {
   history.rotation.y = -currentHistorySceneIndex * Math.PI / 2;
 
   mainScene.add(history);
-  // addDogScene(history, 0 * Math.PI / 2);
+  addDogScene(history, 0 * Math.PI / 2).then(({animation}) => animation.start());
   // addPyramidScene(history, 1 * Math.PI / 2);
   // addCompassScene(history, 2 * Math.PI / 2);
   // addSonyaScene(history, 3 * Math.PI / 2);
-
-  addKeyholeScene(mainScene)
-    .then(({animation}) => {
-      animation.start();
-    });
+  // addKeyholeScene(mainScene).then(({animation}) => animation.start());
 
   // const gui = getGUI(`Press &lt;TAB> to switch scene`);
   // const sceneController = gui.add({

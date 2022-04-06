@@ -9,12 +9,15 @@ import {addDog} from '3d/objects/dog';
 
 import {castShadow, receiveShadow} from '3d/helpers/object-helpers';
 import {ObjectName} from '3d/constants/object-name';
+import {CompositeAnimation} from 'helpers/composite-animation';
 
 export const addDogScene = async (parent, yRotation) => {
   const scene = new THREE.Group();
   scene.rotateY(yRotation);
 
-  await Promise.all([
+  const [
+    suitcase,
+  ] = await Promise.all([
     addHistorySuitcase(scene, `Dog suitcase`),
     addDogCarpet(scene),
     addDogSaturn(scene),
@@ -37,5 +40,10 @@ export const addDogScene = async (parent, yRotation) => {
   ]);
 
   parent.add(scene);
-  return scene;
+  return {
+    scene,
+    animation: new CompositeAnimation([
+      suitcase.animation,
+    ]),
+  };
 };
