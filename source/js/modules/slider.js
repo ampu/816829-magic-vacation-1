@@ -117,6 +117,9 @@ export default () => {
   };
 
   const renderSlide = (slide) => {
+    if (!slide) {
+      return;
+    }
     document.documentElement.style.setProperty(`--theme-color`, slide.themeColor);
     dispatchSlideChangeEvent(slide);
   };
@@ -125,8 +128,4 @@ export default () => {
 
   window.addEventListener(`resize`, renderSlider);
   renderSlider();
-
-  setTimeout(() => {
-    storySlider.slideNext();
-  });
 };

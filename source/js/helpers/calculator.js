@@ -11,6 +11,13 @@ import {easeLinear} from './easings';
  *   onProgress?: Easing,
  * }} CalculatorRange - assert(minX <= maxX)
  *
+ * @typedef {function(x: number, progress: number): number} CompositeItemCalculator
+ *
+ * @typedef {{
+ *   xRange?: [minX: number, maxX: number],
+ *   calculate?: Calculator | CompositeItemCalculator,
+ * }} CompositeCalculatorRange - assert(minX <= maxX)
+ *
  * @typedef {function(x: number): number[]} VectorCalculator
  *
  * @typedef {{
@@ -46,10 +53,15 @@ export const rotatePoint = ([x, y], degrees = 0) => {
   ];
 };
 
-const calculateY = (x, minX, maxX, startY, endY, onProgress) => {
+const calculateProgress = (x, minX, maxX) => {
   x = clamp(x, minX, maxX);
   const progress = (x - minX) / (maxX - minX);
-  const y = startY + (endY - startY) * onProgress(Number.isFinite(progress) ? progress : MAX_PROGRESS);
+  return Number.isFinite(progress) ? progress : MAX_PROGRESS;
+};
+
+const calculateY = (x, minX, maxX, startY, endY, onProgress) => {
+  const progress = calculateProgress(x, minX, maxX);
+  const y = startY + (endY - startY) * onProgress(progress);
   return clamp(y, min(startY, endY), max(startY, endY));
 };
 
@@ -118,26 +130,35 @@ export class NamedCalculator {
  * @param {CalculatorRange[]} ranges
  * @return {Calculator}
  */
-export const createCompositeCalculator = (ranges) => {
+export const createRangesCalculator = (ranges) => {
+  return createCompositeCalculator(ranges.map((range) => {
+    return {
+      xRange: range.xRange,
+      calculate: createCalculator(range),
+    };
+  }), false);
+};
+
+/**
+ * @param {CompositeCalculatorRange[]} ranges
+ * @param {boolean} isBasedOnProgress
+ * @return {Calculator}
+ */
+export const createCompositeCalculator = (ranges, isBasedOnProgress = false) => {
   let compositeMinX = +Infinity;
   let compositeMaxX = -Infinity;
-  ranges.forEach(({xRange: [minX, maxX], yRange}, i) => {
+  ranges.forEach(({xRange: [minX, maxX] = DEFAULT_X_RANGE}, i) => {
     if (!(minX <= maxX)) {
       throw new Error(`createCompositeCalculator(): minX (${minX}) shall not be more than maxX (${maxX}) in #${i + 1}/${ranges.length}`);
     }
-
     compositeMinX = min(compositeMinX, minX);
     compositeMaxX = max(compositeMaxX, maxX);
-
-    if (yRange.length === 1) {
-      yRange.push(yRange[0]);
-    }
   });
 
   return (x) => {
     x = clamp(x, compositeMinX, compositeMaxX);
 
-    const currentRange = ranges.find(({xRange: [currentMinX]}, i) => {
+    const currentRange = ranges.find(({xRange: [currentMinX] = DEFAULT_X_RANGE}, i) => {
       const nextMinX = i === ranges.length - 1
         ? +Infinity
         : ranges[i + 1].xRange[0];
@@ -146,12 +167,12 @@ export const createCompositeCalculator = (ranges) => {
     });
 
     const {
+      calculate,
       xRange: [minX, maxX] = DEFAULT_X_RANGE,
-      yRange: [startY, endY] = DEFAULT_Y_RANGE,
-      onProgress = easeLinear,
     } = currentRange;
 
-    return calculateY(x, minX, maxX, startY, endY, onProgress);
+    const progress = calculateProgress(x, minX, maxX);
+    return calculate(isBasedOnProgress ? progress : x);
   };
 };
 

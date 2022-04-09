@@ -33,7 +33,7 @@ const SONYA_SATURN = {
 
 const KEYHOLE_SATURN = {
   height: 65,
-  position: [335, -111 + PENDANT_HEIGHT, 100],
+  position: [335, -111 + PENDANT_HEIGHT / 2, 100],
   rotation: [20, -25, 10, `XYZ`],
 };
 

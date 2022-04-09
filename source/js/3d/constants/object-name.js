@@ -1,4 +1,5 @@
 export const ObjectName = {
+  AIRPLANE: `airplane`,
   SUITCASE: `suitcase`,
   STATIC: `static`,
   WALL: `wall`,

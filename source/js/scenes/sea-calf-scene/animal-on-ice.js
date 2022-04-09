@@ -1,6 +1,6 @@
 import {SceneObject} from 'scenes/scene-object';
 import {SceneObjectState} from 'scenes/scene-object-state';
-import {createCalculator, createCompositeCalculator} from 'helpers/calculator';
+import {createCalculator, createRangesCalculator} from 'helpers/calculator';
 import {FrameAnimation} from 'helpers/frame-animation';
 import {easeInOut} from 'helpers/easings';
 
@@ -30,7 +30,7 @@ export default new SceneObject({
     duration: 1800,
     userState: {
       getOpacity: createCalculator({xRange: [0, 300]}),
-      getTranslateY: createCompositeCalculator([
+      getTranslateY: createRangesCalculator([
         {xRange: [0, 300], yRange: [630, 0]},
         {xRange: [300, 600], yRange: [0, 90]},
         {xRange: [600, 900], yRange: [90, 35]},
@@ -38,7 +38,7 @@ export default new SceneObject({
         {xRange: [1200, 1500], yRange: [70, 45]},
         {xRange: [1500, 1800], yRange: [45, 50]},
       ]),
-      getRotate: createCompositeCalculator([
+      getRotate: createRangesCalculator([
         {xRange: [300, 500], yRange: [20, 0], onProgress: easeInOut},
         {xRange: [550, 750], yRange: [0, 5], onProgress: easeInOut},
         {xRange: [800, 1100], yRange: [5, -5], onProgress: easeInOut},

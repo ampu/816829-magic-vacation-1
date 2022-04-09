@@ -1,10 +1,10 @@
 import {SceneObject} from 'scenes/scene-object';
 import {SceneObjectState} from 'scenes/scene-object-state';
 import {FrameAnimation} from 'helpers/frame-animation';
-import {createCalculator, createCompositeCalculator} from 'helpers/calculator';
+import {createCalculator, createRangesCalculator} from 'helpers/calculator';
 import {easeInQuad, easeOutQuad} from 'helpers/easings';
 
-const getOpacity = createCompositeCalculator([
+const getOpacity = createRangesCalculator([
   {xRange: [0, 1], yRange: [0]},
   {xRange: [1, 2], yRange: [1]},
   {xRange: [1099, 1100], yRange: [0]},
@@ -14,7 +14,7 @@ const getScale = createCalculator({xRange: [0, 450]});
 
 const getTranslateX = createCalculator({xRange: [0, 500], yRange: [0, -205], onProgress: easeOutQuad});
 
-const getTranslateY = createCompositeCalculator([
+const getTranslateY = createRangesCalculator([
   {xRange: [0, 500], yRange: [0, -70], onProgress: easeOutQuad},
   {xRange: [600, 1100], yRange: [-70, 400 + 160 / 2], onProgress: easeInQuad},
 ]);

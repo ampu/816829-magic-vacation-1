@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 
+import {ObjectName} from '3d/constants/object-name';
 import {CompositeAnimation} from 'helpers/composite-animation';
 import {FrameAnimation} from 'helpers/frame-animation';
 import {createPhaseShiftSineCalculator, createVectorCalculator} from 'helpers/calculator';
@@ -17,16 +18,19 @@ import {addQuestion} from '3d/objects/question';
 import {addKeyholeSaturn} from '3d/objects/saturn';
 import {addKeyholeLeaf} from '3d/objects/leaf';
 
-const ANIMATION_DELAY = 1400;
-const ANIMATION_DURATION = 1200;
-const AIRPLANE_ANIMATION_DELAY = 2400;
-const AIRPLANE_ANIMATION_DURATION = 800;
+const OBJECT_NAME_TO_TIMELINE = {
+  [``]: {delay: 1400, duration: 1200},
+  [ObjectName.AIRPLANE]: {delay: 2400, duration: 800},
+  [ObjectName.SUITCASE]: {delay: 1700, duration: 800},
+};
 
 const BackgroundConstraint = {
   DELAY_OFFSET: {min: 100, max: 200},
   HEIGHT: {min: 10, max: 20},
   PERIOD: {min: 1000, max: 3000},
 };
+
+const DEFAULT_CAMERA_POSITION = {x: 0, y: 0, z: 1000};
 
 export const addKeyholeScene = async (parent) => {
   const scene = new THREE.Group();
@@ -63,11 +67,10 @@ export const addKeyholeScene = async (parent) => {
     question,
     saturn,
     leaf,
-  ].map(({object, onRenderFrame}) => {
+  ].map(({object, isExclusiveAnimation, onRenderFrame}) => {
     const wrapper = wrapObject(object);
 
-    const delay = object === airplane ? AIRPLANE_ANIMATION_DELAY : ANIMATION_DELAY;
-    const duration = object === airplane ? AIRPLANE_ANIMATION_DURATION : ANIMATION_DURATION;
+    const {delay, duration} = OBJECT_NAME_TO_TIMELINE[object.name] || OBJECT_NAME_TO_TIMELINE[``];
 
     const delayOffset = generateIntegerByConstraint(BackgroundConstraint.DELAY_OFFSET);
     const period = generateIntegerByConstraint(BackgroundConstraint.PERIOD);
@@ -87,8 +90,10 @@ export const addKeyholeScene = async (parent) => {
         onRenderFrame(state) {
           const {progress} = state;
 
-          object.scale.set(progress, progress, progress);
-          object.position.set(...getPosition(progress));
+          if (!isExclusiveAnimation) {
+            object.scale.set(progress, progress, progress);
+            object.position.set(...getPosition(progress));
+          }
 
           if (onRenderFrame) {
             onRenderFrame(state);
@@ -110,6 +115,7 @@ export const addKeyholeScene = async (parent) => {
 
   parent.add(scene);
   return {
+    defaultCameraPosition: DEFAULT_CAMERA_POSITION,
     scene,
     animation,
   };

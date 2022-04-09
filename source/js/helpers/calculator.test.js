@@ -1,7 +1,7 @@
 import {describe, it} from 'mocha';
 import {assert} from 'chai';
 
-import {createCalculator, createCompositeCalculator} from './calculator';
+import {createCalculator, createRangesCalculator} from './calculator';
 import {easeInQuad} from './easings';
 
 const {throws, doesNotThrow, strictEqual, approximately} = assert;
@@ -146,28 +146,28 @@ describe(`Calculator`, () => {
   });
 });
 
-describe(`Composite Calculator`, () => {
-  it(`should throw Error when createCompositeCalculator is called with minX > maxX`, () => {
-    throws(() => createCompositeCalculator([
+describe(`Ranges Calculator`, () => {
+  it(`should throw Error when createRangesCalculator is called with minX > maxX`, () => {
+    throws(() => createRangesCalculator([
       {xRange: [0, 1], yRange: [0, 1]},
       {xRange: [1, 0], yRange: [0, 1]},
     ]));
 
-    throws(() => createCompositeCalculator([
+    throws(() => createRangesCalculator([
       {xRange: [1, 0], yRange: [0, 1]},
       {xRange: [0, 1], yRange: [0, 1]},
     ]));
   });
 
-  it(`should not throw Error when createCompositeCalculator is called with startY > endY`, () => {
-    doesNotThrow(() => createCompositeCalculator([
+  it(`should not throw Error when createRangesCalculator is called with startY > endY`, () => {
+    doesNotThrow(() => createRangesCalculator([
       {xRange: [0, 1], yRange: [0, 1]},
       {xRange: [0, 1], yRange: [0, 1]},
     ]));
   });
 
   it(`should calculate values correctly when yRange is 0 to 1`, () => {
-    const calculate = createCompositeCalculator([
+    const calculate = createRangesCalculator([
       {xRange: [0, 1], yRange: [0, 100]},
       {xRange: [0, 1], yRange: [0, 1]},
     ]);
@@ -181,7 +181,7 @@ describe(`Composite Calculator`, () => {
   });
 
   it(`should calculate values correctly when yRange is 0 to 100`, () => {
-    const calculate = createCompositeCalculator([
+    const calculate = createRangesCalculator([
       {xRange: [0, 1], yRange: [0, 1]},
       {xRange: [0, 1], yRange: [0, 100]},
     ]);
@@ -195,7 +195,7 @@ describe(`Composite Calculator`, () => {
   });
 
   it(`should calculate values correctly when yRange is -100 to 100`, () => {
-    const calculate = createCompositeCalculator([
+    const calculate = createRangesCalculator([
       {xRange: [0, 1], yRange: [0, 1]},
       {xRange: [0, 1], yRange: [-100, 100]},
     ]);
@@ -209,7 +209,7 @@ describe(`Composite Calculator`, () => {
   });
 
   it(`should calculate values correctly when yRange is 1 down to 0`, () => {
-    const calculate = createCompositeCalculator([
+    const calculate = createRangesCalculator([
       {xRange: [0, 1], yRange: [0, 1]},
       {xRange: [0, 1], yRange: [1, 0]},
     ]);
@@ -223,7 +223,7 @@ describe(`Composite Calculator`, () => {
   });
 
   it(`should calculate values correctly when yRange is 100 down to 0`, () => {
-    const calculate = createCompositeCalculator([
+    const calculate = createRangesCalculator([
       {xRange: [0, 1], yRange: [0, 1]},
       {xRange: [0, 1], yRange: [100, 0]},
     ]);
@@ -237,7 +237,7 @@ describe(`Composite Calculator`, () => {
   });
 
   it(`should calculate values correctly when yRange is 100 down to -100`, () => {
-    const calculate = createCompositeCalculator([
+    const calculate = createRangesCalculator([
       {xRange: [0, 1], yRange: [0, 1]},
       {xRange: [0, 1], yRange: [100, -100]},
     ]);
@@ -251,7 +251,7 @@ describe(`Composite Calculator`, () => {
   });
 
   it(`should calculate values correctly when yRange is 0 down to -1`, () => {
-    const calculate = createCompositeCalculator([
+    const calculate = createRangesCalculator([
       {xRange: [0, 1], yRange: [0, 1]},
       {xRange: [0, 1], yRange: [0, -1]},
     ]);
@@ -265,7 +265,7 @@ describe(`Composite Calculator`, () => {
   });
 
   it(`should calculate values correctly when yRange is 0 down to -100`, () => {
-    const calculate = createCompositeCalculator([
+    const calculate = createRangesCalculator([
       {xRange: [0, 1], yRange: [0, 1]},
       {xRange: [0, 1], yRange: [0, -100]},
     ]);
@@ -279,7 +279,7 @@ describe(`Composite Calculator`, () => {
   });
 
   it(`should calculate values correctly when xRange is 0 to 100`, () => {
-    const calculate = createCompositeCalculator([
+    const calculate = createRangesCalculator([
       {xRange: [0, 1], yRange: [0, 1]},
       {xRange: [0, 100], yRange: [0, 1]},
     ]);
@@ -293,7 +293,7 @@ describe(`Composite Calculator`, () => {
   });
 
   it(`should calculate values correctly when xRange is -100 to 100`, () => {
-    const calculate = createCompositeCalculator([
+    const calculate = createRangesCalculator([
       {xRange: [0, 1], yRange: [0, 1]},
       {xRange: [-100, 100], yRange: [0, 1]},
     ]);
@@ -307,7 +307,7 @@ describe(`Composite Calculator`, () => {
   });
 
   it(`should calculate values correctly when quadratic easing is specified`, () => {
-    const calculate = createCompositeCalculator([
+    const calculate = createRangesCalculator([
       {xRange: [0, 1], yRange: [0, 1]},
       {xRange: [0, 100], yRange: [0, 100], onProgress: easeInQuad},
     ]);
@@ -321,7 +321,7 @@ describe(`Composite Calculator`, () => {
   });
 
   it(`should calculate values correctly when there is only single point on x axes`, () => {
-    const calculate = createCompositeCalculator([
+    const calculate = createRangesCalculator([
       {xRange: [0, 1], yRange: [0, 1]},
       {xRange: [1, 1], yRange: [-100, 100]},
     ]);
@@ -335,7 +335,7 @@ describe(`Composite Calculator`, () => {
   });
 
   it(`should calculate values correctly with disjoint ranges`, () => {
-    const calculate = createCompositeCalculator([
+    const calculate = createRangesCalculator([
       {xRange: [0, 0.4], yRange: [-100, -50]},
       {xRange: [0.6, 1], yRange: [50, 100]},
     ]);

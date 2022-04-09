@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader';
 
 import {FrameAnimation} from 'helpers/frame-animation';
-import {createCompositeCalculator, multiplyRanges} from 'helpers/calculator';
+import {createRangesCalculator, multiplyRanges} from 'helpers/calculator';
 import {easeInOutSine} from 'helpers/easings';
 
 import {ObjectName} from '3d/constants/object-name';
@@ -31,7 +31,7 @@ export const addDog = (parent) => {
 
       const tail = object.getObjectByName(ObjectName.DOG_TAIL);
 
-      const getTailRotationX = createCompositeCalculator(multiplyRanges([
+      const getTailRotationX = createRangesCalculator(multiplyRanges([
         {xRange: [0, 40], yRange: [0, -22], onProgress: easeInOutSine},
         {xRange: [40, 120], yRange: [-22, 25]},
         {xRange: [120, 160], yRange: [25, -25]},

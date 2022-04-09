@@ -39,13 +39,14 @@ const createRotationController = (object, property) => {
  * @param {lil.GUI} gui
  * @param {Object3D} object
  * @param {function} onChange
+ * @return {lil.GUI}
  */
 export const addRotationGUI = (gui, object, onChange = NOOP) => {
-  const rotation = gui.addFolder(`rotation`);
+  const folder = gui.addFolder(`rotation`);
   const controllers = [
-    rotation.add(...createRotationController(object.rotation, `x`)),
-    rotation.add(...createRotationController(object.rotation, `y`)),
-    rotation.add(...createRotationController(object.rotation, `z`)),
+    folder.add(...createRotationController(object.rotation, `x`)),
+    folder.add(...createRotationController(object.rotation, `y`)),
+    folder.add(...createRotationController(object.rotation, `z`)),
   ];
   const onChangeWithUpdate = () => {
     onChange();
@@ -56,5 +57,33 @@ export const addRotationGUI = (gui, object, onChange = NOOP) => {
   for (const controller of controllers) {
     controller.onChange(onChangeWithUpdate);
   }
-  gui.add(object.rotation, `order`, [`XYZ`, `XZY`, `YXZ`, `YZX`, `ZXY`, `ZYX`]);
+  folder.add(object.rotation, `order`, [`XYZ`, `XZY`, `YXZ`, `YZX`, `ZXY`, `ZYX`]);
+  return folder;
+};
+
+/**
+ * @param {lil.GUI} gui
+ * @param {function} onGet
+ * @param {function} onSet
+ * @param {function} onChange
+ * @return {lil.Controller}
+ */
+export const addProgressController = (gui, onGet, onSet, onChange = NOOP) => {
+  const controller = gui.add({
+    get progress() {
+      return Number(onGet().toFixed(1));
+    },
+    set progress(value) {
+      onSet(value);
+    },
+  }, `progress`, 0, 1);
+
+  const onChangeWithUpdate = () => {
+    onChange();
+    controller.updateDisplay();
+  };
+
+  controller.onChange(onChangeWithUpdate);
+
+  return controller;
 };

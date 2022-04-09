@@ -112,3 +112,10 @@ export const wrapObject = (object) => {
   }
   return wrapper;
 };
+
+export const centerObjectTransformOrigin = (object, keys = [`x`, `y`, `z`], size = getObjectSize(object)) => {
+  for (const key of keys) {
+    object.position[key] = -size[key] / 2;
+  }
+  return size;
+};

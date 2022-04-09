@@ -1,5 +1,6 @@
 import {OBJLoader} from 'three/examples/jsm/loaders/objloader';
 import {Material} from '3d/materials/materials';
+import {ObjectName} from '3d/constants/object-name';
 import {wrapObject, rotateObjectInDegrees, scaleObjectToFitHeight} from '3d/helpers/object-helpers';
 
 export const AIRPLANE = {
@@ -25,11 +26,12 @@ export const addAirplane = async (parent) => {
       rotateObjectInDegrees(object, AIRPLANE.rotation);
 
       const wrapper = wrapObject(object);
+      wrapper.name = ObjectName.AIRPLANE;
       wrapper.position.set(...AIRPLANE.position);
-      parent.add(wrapper);
 
+      parent.add(wrapper);
       return {
-        object, wrapper,
+        object: wrapper,
         onRenderFrame() {
         },
       };

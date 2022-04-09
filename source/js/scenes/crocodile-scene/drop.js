@@ -1,35 +1,35 @@
 import {SceneObject} from 'scenes/scene-object';
 import {SceneObjectState} from 'scenes/scene-object-state';
 import {FrameAnimation} from 'helpers/frame-animation';
-import {createCompositeCalculator} from 'helpers/calculator';
+import {createRangesCalculator} from 'helpers/calculator';
 
 const AMPLITUDE = 1700;
 const HEIGHT = 59;
 const MAX_SCALE_Y = 1.1;
 
-const getScaleX = createCompositeCalculator([
+const getScaleX = createRangesCalculator([
   {xRange: [0, 500], yRange: [0, 1]},
   {xRange: [650, 950], yRange: [1, 0.9]},
   {xRange: [950, 1150], yRange: [0.9, 0]},
 ]);
 
-const getScaleY = createCompositeCalculator([
+const getScaleY = createRangesCalculator([
   {xRange: [0, 500], yRange: [0, 1]},
   {xRange: [650, 950], yRange: [1, MAX_SCALE_Y]},
   {xRange: [950, 1150], yRange: [MAX_SCALE_Y, 0]},
 ]);
 
-const getCenterY = createCompositeCalculator([
+const getCenterY = createRangesCalculator([
   {xRange: [949, 950], yRange: [0]},
   {xRange: [950, 951], yRange: [0.5]},
 ]);
 
-const getTranslateY = createCompositeCalculator([
+const getTranslateY = createRangesCalculator([
   {xRange: [650, 950], yRange: [0, 35]},
   {xRange: [950, 951], yRange: [35 + MAX_SCALE_Y * HEIGHT / 2]},
 ]);
 
-const getOpacity = createCompositeCalculator([
+const getOpacity = createRangesCalculator([
   {xRange: [0, 1], yRange: [0, 1]},
   {xRange: [950, 1150], yRange: [1, 0]},
 ]);
