@@ -3,7 +3,12 @@ import clamp from 'lodash/clamp';
 import {easeLinear} from './easings';
 
 /**
- * @typedef {function(x: number): number} Calculator
+ * @typedef {function(t: number): number} Calculator
+ *
+ * @typedef {{
+ *   calculateY: function(t: number): number,
+ *   calculateTangent: function(t: number): number,
+ * }} TangentCalculator
  *
  * @typedef {{
  *   xRange?: [minX: number, maxX: number],
@@ -16,6 +21,7 @@ import {easeLinear} from './easings';
  * @typedef {{
  *   xRange?: [minX: number, maxX: number],
  *   calculate?: Calculator | CompositeItemCalculator,
+ *   isBasedOnProgress?: boolean,
  * }} CompositeCalculatorRange - assert(minX <= maxX)
  *
  * @typedef {function(x: number): number[]} VectorCalculator
@@ -27,24 +33,22 @@ import {easeLinear} from './easings';
  * }} VectorCalculatorRange - assert(minX <= maxX)
  */
 
-const {PI, E, min, max, sin, cos, atan, pow} = Math;
+const {PI, E, sign, min, max, sin, cos, atan, pow, log} = Math;
 
-const HALF_CIRCLE_DEGREES = 180;
-export const RADIANS_RATIO = PI / HALF_CIRCLE_DEGREES;
-export const DEGREES_RATIO = HALF_CIRCLE_DEGREES / PI;
+export const RADIAN = PI / 180;
 const MAX_PROGRESS = 1;
 const DEFAULT_X_RANGE = [0, 1];
 const DEFAULT_Y_RANGE = [0, 1];
 const DEFAULT_VECTOR_Y_RANGE = [[0, 0, 0], [1, 1, 1]];
 
-export const convertDegreesToRadians = (degrees) => degrees * RADIANS_RATIO;
-export const convertRadiansToDegrees = (radians) => radians * DEGREES_RATIO;
+export const convertDegreesToRadians = (degrees) => degrees * RADIAN;
+export const convertRadiansToDegrees = (radians) => radians / RADIAN;
 export const convertTangentToDegrees = (tangent) => convertRadiansToDegrees(atan(tangent));
 
 export const calculateTangentY1 = (x0, y0, x1, dy0) => dy0 * (x1 - x0) + y0;
 
 export const rotatePoint = ([x, y], degrees = 0) => {
-  const radians = convertDegreesToRadians(degrees);
+  const radians = degrees * RADIAN;
   const cosine = cos(radians);
   const sine = sin(radians);
   return [
@@ -112,7 +116,7 @@ export const createRotationCalculator = ({
     throw new Error(`createVectorCalculator(): minX (${minX}) shall not be more than maxX (${maxX})`);
   }
   return (x) => {
-    return startY.map((_, i) => calculateY(x, minX, maxX, startY[i], endY[i], onProgress) * RADIANS_RATIO);
+    return startY.map((_, i) => calculateY(x, minX, maxX, startY[i], endY[i], onProgress) * RADIAN);
   };
 };
 
@@ -141,10 +145,10 @@ export const createRangesCalculator = (ranges) => {
 
 /**
  * @param {CompositeCalculatorRange[]} ranges
- * @param {boolean} isBasedOnProgress
+ * @param {boolean} isAllBasedOnProgress
  * @return {Calculator}
  */
-export const createCompositeCalculator = (ranges, isBasedOnProgress = false) => {
+export const createCompositeCalculator = (ranges, isAllBasedOnProgress = false) => {
   let compositeMinX = +Infinity;
   let compositeMaxX = -Infinity;
   ranges.forEach(({xRange: [minX, maxX] = DEFAULT_X_RANGE}, i) => {
@@ -167,46 +171,96 @@ export const createCompositeCalculator = (ranges, isBasedOnProgress = false) => 
     });
 
     const {
-      calculate,
       xRange: [minX, maxX] = DEFAULT_X_RANGE,
+      calculate,
+      isBasedOnProgress = isAllBasedOnProgress,
     } = currentRange;
 
-    const progress = calculateProgress(x, minX, maxX);
-    return calculate(isBasedOnProgress ? progress : x);
+    return calculate(isBasedOnProgress ? calculateProgress(x, minX, maxX) : x);
   };
 };
 
 /**
- * @param {number} x
- * @param {number} y
- * @param {number} width
- * @param {number} height
- * @param {number} amplitude
- * @return {{
- *   calculateY: (function(progress: number): number ),
- *   calculateTangent: (function(progress: number): number),
- * }}
+ * @param {number} x1
+ * @param {number} y1
+ * @param {number} x2
+ * @param {number} y2
+ * @return {TangentCalculator}
  */
-export const createSineCalculator = ({x = 0, y = 0, width = 1, height = 2, amplitude = 1} = {}) => {
-  const ratio = 2 * PI / amplitude;
+export const createLineCalculator = ([x1, y1] = [0, 0], [x2, y2] = [1, 1]) => {
   return {
-    calculateY: (progress) => height / 2 * sin(ratio * (width * progress + x)) + y,
-    calculateTangent: (progress) => height / 2 * ratio * cos(ratio * (width * progress + x)),
+    calculateY: (t) => (t - x1) / (x2 - x1) * (y2 - y1) + y1,
+    calculateTangent: () => (y2 - y1) / (x2 - x1),
   };
 };
 
 /**
- * @param {number} height
- * @param {number} amplitude
- * @param {number} phaseShift
+ * @param {number} minX
+ * @param {number} maxX
+ * @return {TangentCalculator}
+ */
+export const createFadingCalculator = ([minX, maxX]) => {
+  const line = createLineCalculator([minX, 1], [maxX, 0]);
+  return {
+    calculateY: (t) => minX <= t && t <= maxX ? line.calculateY(t) : Number(t < minX),
+    calculateTangent: (t) => minX <= t && t <= maxX ? line.calculateTangent(t) : 0,
+  };
+};
+
+/**
+ * @param {number} ratio
+ * @param {number} base
+ * @return {TangentCalculator}
+ */
+export const createInfiniteFadingCalculator = (ratio = 1, base = E) => {
+  return {
+    calculateY: (t) => base ** (-ratio * t),
+    calculateTangent: (t) => -ratio * log(base) * base ** (-ratio * t)
+  };
+};
+
+/**
  * @return {{
- *   calculateY: (function(progress: number): number ),
+ *   calculateY: (function(t: number): number),
+ *   calculateTangent: (function(t: number): number),
  * }}
  */
-export const createPhaseShiftSineCalculator = ({height = 2, amplitude = 1, phaseShift = 0}) => {
-  const doCalculateY = (x) => height / 2 * Math.sin(PI * (x / amplitude + phaseShift));
+export const createSineCalculator = ({
+  swing = 2,
+  y = 0,
+  period = 1,
+  x = 0,
+  ratio = 1,
+} = {}) => {
   return {
-    calculateY: (x) => doCalculateY(x) - doCalculateY(0),
+    calculateY: (t) => ratio * (swing / 2 * sin(2 * PI / period * (t + x)) + y),
+    calculateTangent: (t) => sign(ratio) * 2 * PI / period * swing / 2 * cos(2 * PI / period * (t + x)),
+  };
+};
+
+/**
+ * @param {TangentCalculator} calculator
+ * @param {number} t0
+ * @return {TangentCalculator}
+ */
+export const createDifferenceCalculator = (calculator, t0 = 0) => {
+  const y0 = calculator.calculateY(t0);
+  const tangent0 = calculator.calculateTangent(t0);
+  return {
+    calculateY: (t) => calculator.calculateY(t) - y0,
+    calculateTangent: (t) => calculator.calculateTangent(t) - tangent0,
+  };
+};
+
+/**
+ * @param {TangentCalculator} calculator
+ * @param {TangentCalculator} otherCalculator
+ * @return {TangentCalculator}
+ */
+export const createMultiplicationCalculator = ([calculator, otherCalculator]) => {
+  return {
+    calculateY: (t) => calculator.calculateY(t) * otherCalculator.calculateY(t),
+    calculateTangent: (t) => calculator.calculateTangent(t) * otherCalculator.calculateY(t) + calculator.calculateY(t) * otherCalculator.calculateTangent(t),
   };
 };
 
@@ -217,14 +271,11 @@ export const createPhaseShiftSineCalculator = ({height = 2, amplitude = 1, phase
  * @param {number} height
  * @param {number} amplitude
  * @param {number} fadingRatio
- * @return {{
- *   calculateY: (function(progress: number): number),
- * }}
+ * @return {{calculateY: Calculator}}
  */
-export const createFadingSineCalculator = ({x = 0, y = 0, width = 1, height = 2, amplitude = 1, fadingRatio = 1} = {}) => {
-  const ratio = 2 * PI / amplitude;
+export const createFadingSineCalculator = ({x = 0, y = 0, tRatio = 1, height = 2, amplitude = 1, fadingRatio = 1} = {}) => {
   return {
-    calculateY: (progress) => height / 2 * pow(E, -fadingRatio * progress / amplitude) * sin(ratio * (width * progress + x)) + y,
+    calculateY: (t) => height / 2 * pow(E, -fadingRatio * t / amplitude) * sin(2 * PI / amplitude * (tRatio * t + x)) + y,
   };
 };
 
@@ -248,4 +299,15 @@ export const multiplyRange = ({xRange, yRange, onProgress}, multiplier) => {
  */
 export const multiplyRanges = (ranges, multiplier) => {
   return ranges.map((range) => multiplyRange(range, multiplier));
+};
+
+export const dumpCalculator = (calculator, [minX, maxX] = [0, 1], step = (maxX - minX) / 4, keyFractionDigits = 2, valueFractionDigits = 1) => {
+  const y = {};
+  const degrees = {};
+  for (let x = minX; x <= maxX; x += step) {
+    y[x.toFixed(keyFractionDigits)] = Number(calculator.calculateY(x).toFixed(valueFractionDigits));
+    degrees[x.toFixed(keyFractionDigits)] = Number(convertTangentToDegrees(calculator.calculateTangent(x)).toFixed(valueFractionDigits));
+  }
+  // eslint-disable-next-line no-console
+  console.log({y, degrees});
 };

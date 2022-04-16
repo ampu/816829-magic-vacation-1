@@ -1,12 +1,12 @@
 import * as THREE from 'three';
 
-import {containSize} from 'helpers/document-helpers';
 import {ScreenId, ScreenState, addScreenListener} from 'helpers/screen-helpers';
 import CustomMaterial from './materials/custom-material';
 import TextureMaterial from './materials/texture-material';
 import {SLIDES, addSlideChangeListener} from 'modules/slider';
 import {FrameAnimation, calculateIteration} from 'helpers/frame-animation';
 import {NamedCalculator, createCalculator, createFadingSineCalculator} from 'helpers/calculator';
+import {Infrastructure} from '3d/helpers/infrastructure';
 
 const INTRO_TEXTURE_URL = `./img/scenes-textures/scene-0.png`;
 const INTRO_TEXTURE_HUE_ROTATION = 0;
@@ -31,57 +31,6 @@ const Bubble = {
   },
 };
 
-const initScene = ({
-  canvas,
-  width,
-  height,
-  fov = 90,
-  near = 0.1,
-  far = 510,
-  clearColor = INTRO_THEME_COLOR,
-}) => {
-  [width, height] = containSize(PLANE_SIZE, [width, height]);
-
-  const renderer = typeof WebGLDebugUtils !== `undefined`
-    ? new THREE.WebGLRenderer({
-      canvas,
-      /* eslint-disable-next-line no-undef */
-      context: WebGLDebugUtils.makeDebugContext(canvas.getContext(`webgl`)),
-      alpha: true,
-    })
-    : new THREE.WebGLRenderer({
-      canvas,
-      alpha: true,
-    });
-
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(width, height);
-  renderer.setClearColor(new THREE.Color(clearColor));
-
-  const scene = new THREE.Scene();
-
-  const camera = new THREE.PerspectiveCamera(fov, width / height, near, far);
-  camera.position.z = far;
-
-  return {renderer, scene, camera};
-};
-
-const resizeScene = ({
-  renderer,
-  scene,
-  camera,
-  width,
-  height,
-}) => {
-  [width, height] = containSize(PLANE_SIZE, [width, height]);
-
-  camera.aspect = width / height;
-  camera.updateProjectionMatrix();
-
-  renderer.setSize(width, height);
-  renderer.render(scene, camera);
-};
-
 const createTexturePlane = (textureUrl, isCustom) => {
   const geometry = new THREE.PlaneBufferGeometry(...PLANE_SIZE);
 
@@ -104,15 +53,19 @@ const createTexturePlane = (textureUrl, isCustom) => {
 };
 
 export default () => {
-  const animationScreen = document.querySelector(`.animation-screen`);
-  const canvas = animationScreen.querySelector(`canvas`);
   const introTexturePlane = createTexturePlane(INTRO_TEXTURE_URL, INTRO_TEXTURE_HUE_ROTATION, false);
   const slideTexturePlanes = SLIDES.map(({textureUrl, isCustom}) => createTexturePlane(textureUrl, isCustom));
 
-  const {renderer, scene, camera} = initScene({
-    canvas,
-    width: animationScreen.clientWidth,
-    height: animationScreen.clientHeight,
+  const {renderer, scene, camera} = new Infrastructure({
+    container: document.querySelector(`.animation-screen`),
+    canvas: document.querySelector(`.animation-screen canvas`),
+    cameraConfig: {
+      fov: 90,
+      near: 0.1,
+      far: 510,
+      position: {x: 0, y: 0, z: 510},
+    },
+    clearColor: INTRO_THEME_COLOR,
   });
 
   const state = {
@@ -123,21 +76,21 @@ export default () => {
 
   const bubbleCalculators = [
     {
-      getX: createFadingSineCalculator({x: 2 / 3, y: 0.4, width: 3, height: 0.2, amplitude: 1, fadingRatio: 1}).calculateY,
+      getX: createFadingSineCalculator({x: 2 / 3, y: 0.4, tRatio: 3, height: 0.2}).calculateY,
       getY: createCalculator({
         xRange: [Bubble.FIRST.delay, Bubble.FIRST.delay + 1800],
         yRange: [0 - Bubble.FIRST.radius, 1 + Bubble.FIRST.radius],
       }),
     },
     {
-      getX: createFadingSineCalculator({x: 1 / 3, y: 0.25, width: 3, height: 0.1, amplitude: 1, fadingRatio: 1}).calculateY,
+      getX: createFadingSineCalculator({x: 1 / 3, y: 0.25, tRatio: 3, height: 0.1}).calculateY,
       getY: createCalculator({
         xRange: [Bubble.SECOND.delay, Bubble.SECOND.delay + 1800],
         yRange: [0 - Bubble.SECOND.radius, 1 + Bubble.SECOND.radius],
       }),
     },
     {
-      getX: createFadingSineCalculator({x: 0, y: 0.48, width: 3, height: 0.05, amplitude: 1, fadingRatio: 1}).calculateY,
+      getX: createFadingSineCalculator({x: 0, y: 0.48, tRatio: 3, height: 0.05}).calculateY,
       getY: createCalculator({
         xRange: [Bubble.THIRD.delay, Bubble.THIRD.delay + 1800],
         yRange: [0 - Bubble.THIRD.radius, 1 + Bubble.THIRD.radius],
@@ -214,16 +167,6 @@ export default () => {
     }
     renderer.render(scene, camera);
   };
-
-  window.addEventListener(`resize`, () => {
-    resizeScene({
-      renderer,
-      mainScene: scene,
-      camera,
-      width: animationScreen.clientWidth,
-      height: animationScreen.clientHeight,
-    });
-  });
 
   addScreenListener(ScreenId.INTRO, {
     [ScreenState.ACTIVE]: () => {

@@ -1,8 +1,7 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/examples/jsm/loaders/gltfloader';
-import clamp from 'lodash/clamp';
 
-import {addProgressController, addRotationGUI, getGUI} from '3d/helpers/gui-helpers';
+import {addRotationGUI, getGUI} from '3d/helpers/gui-helpers';
 import {centerObjectTransformOrigin, rotateObjectInDegrees, scaleObjectToFitHeight, setPolarPosition2} from '3d/helpers/object-helpers';
 import {ObjectName} from '3d/constants/object-name';
 import {wrapObject} from '3d/helpers/object-helpers';
@@ -49,8 +48,8 @@ export const addKeyholeSuitcase = async (parent) => {
       to: [-45, -75, 0],
       yCalculator: {
         x: 0.2,
-        height: 125,
-        amplitude: 2,
+        swing: 125,
+        period: 2,
       }
     },
     rotation: {
@@ -69,8 +68,6 @@ export const addKeyholeSuitcase = async (parent) => {
   } = KEYHOLE_SUITCASE;
 
   const rotate = createRotationCalculator({yRange: [rotation.from, rotation.to], onProgress: easeLinear});
-
-  let rotationProgress = 0;
 
   const onRenderFrame = ({progress}) => {
     object.rotation.set(...rotate(progress));
@@ -92,26 +89,8 @@ export const addKeyholeSuitcase = async (parent) => {
   centerObjectTransformOrigin(object, [`y`]);
   rotateObjectInDegrees(object, rotation.from);
 
-  const setRotationProgress = (value) => {
-    rotationProgress = clamp(value, 0, 1);
-    progressController.updateDisplay();
-  };
-
   const folder = getGUI().addFolder(`suitcase`);
-  const rotationGUI = addRotationGUI(folder, object);
-  const progressController = addProgressController(folder, () => rotationProgress, (value) => {
-    rotationProgress = value;
-  });
-
-  document.addEventListener(`keydown`, (evt) => {
-    if (evt.keyCode === 37) {
-      setRotationProgress(rotationProgress - 0.1);
-      return;
-    }
-    if (evt.keyCode === 39) {
-      setRotationProgress(rotationProgress + 0.1);
-    }
-  });
+  const rotationGUI = addRotationGUI(folder, object.rotation);
 
   const wrapper = wrapObject(object);
   wrapper.name = ObjectName.SUITCASE;

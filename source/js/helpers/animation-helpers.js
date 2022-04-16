@@ -4,7 +4,7 @@ const getLetterHTML = (letter) => {
     .replace(`<`, `&lt;`);
 };
 
-const applyAccentTypography = (element, lineClassName = `accent-line`) => {
+export const applyAccentTypography = (element, lineClassName = `accent-line`) => {
   if (!element) {
     return;
   }
@@ -21,8 +21,4 @@ const applyAccentTypography = (element, lineClassName = `accent-line`) => {
       `);
     })
     .join(``);
-};
-
-export {
-  applyAccentTypography,
 };

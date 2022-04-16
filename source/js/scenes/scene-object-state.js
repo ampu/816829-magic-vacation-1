@@ -1,6 +1,6 @@
 import flatten from 'lodash/flatten';
 
-import {convertDegreesToRadians, calculateTangentY1} from 'helpers/calculator';
+import {calculateTangentY1, RADIAN} from 'helpers/calculator';
 
 export const renderPolyline = (context, points) => {
   context.beginPath();
@@ -151,7 +151,7 @@ export class SceneObjectState {
   /** @param {CanvasRenderingContext2D} context */
   doRotate(context) {
     if (this.rotate !== 0) {
-      context.rotate(convertDegreesToRadians(this.rotate));
+      context.rotate(this.rotate * RADIAN);
     }
   }
 

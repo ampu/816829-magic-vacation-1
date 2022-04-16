@@ -2,6 +2,7 @@ import {OBJLoader} from 'three/examples/jsm/loaders/objloader';
 import {Material} from '3d/materials/materials';
 import {ObjectName} from '3d/constants/object-name';
 import {wrapObject, rotateObjectInDegrees, scaleObjectToFitHeight} from '3d/helpers/object-helpers';
+import {createAirplaneRig} from '3d/rigs/airplane-rig';
 
 export const AIRPLANE = {
   url: `./3d/module-6/scene-0-objects/airplane.obj`,
@@ -23,17 +24,16 @@ export const addAirplane = async (parent) => {
         }
       });
       scaleObjectToFitHeight(object, AIRPLANE.height);
-      rotateObjectInDegrees(object, AIRPLANE.rotation);
 
       const wrapper = wrapObject(object);
       wrapper.name = ObjectName.AIRPLANE;
+      rotateObjectInDegrees(wrapper, AIRPLANE.rotation);
       wrapper.position.set(...AIRPLANE.position);
 
       parent.add(wrapper);
       return {
         object: wrapper,
-        onRenderFrame() {
-        },
+        rig: createAirplaneRig(wrapper),
       };
     });
 };

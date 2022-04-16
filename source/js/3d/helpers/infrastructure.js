@@ -26,14 +26,16 @@ export class Infrastructure {
   constructor({
     container,
     canvas,
+    cameraConfig = CAMERA_CONFIG,
+    clearColor,
   }) {
     const [width, height] = calculateRendererSize(container);
 
     this.container = container;
     this.cameraPositionStorage = new StateStorage(sessionStorage, `camera-position`);
-    this.defaultCameraPosition = this.cameraPositionStorage.getState(CAMERA_CONFIG.position);
-    this.renderer = createRenderer(canvas, width, height);
-    this.camera = createCamera({...CAMERA_CONFIG, position: this.defaultCameraPosition, width, height});
+    this.defaultCameraPosition = this.cameraPositionStorage.getState(cameraConfig.position);
+    this.renderer = createRenderer(canvas, width, height, clearColor);
+    this.camera = createCamera({...cameraConfig, position: this.defaultCameraPosition, width, height});
     this.scene = createScene(canvas, this.camera);
     this.orbit = addOrbit(canvas, this.camera);
 

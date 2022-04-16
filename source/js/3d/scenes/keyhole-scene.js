@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import {ObjectName} from '3d/constants/object-name';
 import {CompositeAnimation} from 'helpers/composite-animation';
 import {FrameAnimation} from 'helpers/frame-animation';
-import {createPhaseShiftSineCalculator, createVectorCalculator} from 'helpers/calculator';
+import {createDifferenceCalculator, createSineCalculator, createVectorCalculator} from 'helpers/calculator';
 import {easeOutExpo, easeInOut} from 'helpers/easings';
 import {wrapObject} from '3d/helpers/object-helpers';
 import {generateIntegerByConstraint} from 'helpers/random-helpers';
@@ -20,14 +20,14 @@ import {addKeyholeLeaf} from '3d/objects/leaf';
 
 const OBJECT_NAME_TO_TIMELINE = {
   [``]: {delay: 1400, duration: 1200},
-  [ObjectName.AIRPLANE]: {delay: 2400, duration: 800},
+  [ObjectName.AIRPLANE]: {delay: 2300, duration: 900},
   [ObjectName.SUITCASE]: {delay: 1700, duration: 800},
 };
 
 const BackgroundConstraint = {
   DELAY_OFFSET: {min: 100, max: 200},
   HEIGHT: {min: 10, max: 20},
-  PERIOD: {min: 1000, max: 3000},
+  PERIOD: {min: 2000, max: 6000},
 };
 
 const DEFAULT_CAMERA_POSITION = {x: 0, y: 0, z: 1000};
@@ -63,23 +63,23 @@ export const addKeyholeScene = async (parent) => {
     snowflake,
     watermelon,
     suitcase,
-    airplane,
     question,
     saturn,
     leaf,
-  ].map(({object, isExclusiveAnimation, onRenderFrame}) => {
+    airplane,
+  ].map(({object, isExclusiveAnimation, onRenderFrame, rig}) => {
     const wrapper = wrapObject(object);
 
     const {delay, duration} = OBJECT_NAME_TO_TIMELINE[object.name] || OBJECT_NAME_TO_TIMELINE[``];
 
     const delayOffset = generateIntegerByConstraint(BackgroundConstraint.DELAY_OFFSET);
     const period = generateIntegerByConstraint(BackgroundConstraint.PERIOD);
-    const height = generateIntegerByConstraint(BackgroundConstraint.HEIGHT);
+    const swing = generateIntegerByConstraint(BackgroundConstraint.HEIGHT);
 
     const startPosition = object.position.clone();
     const getPosition = createVectorCalculator({yRange: [START_ANIMATION_POSITION, Array.from(startPosition)]});
 
-    const {calculateY: getBackgroundY} = createPhaseShiftSineCalculator({height, amplitude: period, phaseShift: Math.random()});
+    const {calculateY: getBackgroundY} = createDifferenceCalculator(createSineCalculator({swing, period, y: Math.random()}));
 
     return new CompositeAnimation([
       new FrameAnimation({
@@ -90,14 +90,22 @@ export const addKeyholeScene = async (parent) => {
         onRenderFrame(state) {
           const {progress} = state;
 
-          if (!isExclusiveAnimation) {
-            object.scale.set(progress, progress, progress);
-            object.position.set(...getPosition(progress));
+          if (rig) {
+            rig.setScale(progress);
+            rig.setPosition(progress);
+            rig.setRotation(progress);
+            rig.invalidate();
+            return;
           }
 
-          if (onRenderFrame) {
+          if (isExclusiveAnimation) {
             onRenderFrame(state);
+            return;
           }
+
+          object.scale.set(progress, progress, progress);
+          object.position.set(...getPosition(progress));
+          onRenderFrame(state);
         },
       }),
       new FrameAnimation({

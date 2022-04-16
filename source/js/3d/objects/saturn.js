@@ -103,7 +103,7 @@ export const addDogSaturn = (parent) => {
   const saturnWrapper = wrapObject(saturn);
   saturnWrapper.position.set(...DOG_SATURN.position);
 
-  const rotationCalculator = createSineCalculator({amplitude: DOG_SATURN.rotationIterationDuration});
+  const rotationCalculator = createSineCalculator({period: DOG_SATURN.rotationIterationDuration});
 
   parent.add(saturnWrapper);
   return {

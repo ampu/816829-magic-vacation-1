@@ -33,8 +33,8 @@ export const addCompass = (parent) => {
       const arrowCenter = object.getObjectByName(ObjectName.COMPASS_ARROW_CENTER);
 
       const rotationZ = createSineCalculator({
+        period: COMPASS.animation.iterationDuration,
         x: COMPASS.animation.iterationDuration / 4,
-        amplitude: COMPASS.animation.iterationDuration,
       });
 
       const easeRotation = convertToEaseInOut(easeInCubic);

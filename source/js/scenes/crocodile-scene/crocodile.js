@@ -1,7 +1,7 @@
 import {SceneObject} from 'scenes/scene-object';
 import {SceneObjectState} from 'scenes/scene-object-state';
 import {FrameAnimation} from 'helpers/frame-animation';
-import {convertDegreesToRadians} from 'helpers/calculator';
+import {RADIAN} from 'helpers/calculator';
 
 const MASK = {
   angles: [-90, -312],
@@ -42,7 +42,7 @@ export default new SceneObject({
     state.save(context);
 
     context.beginPath();
-    context.arc(0, MASK.upperY, MASK.radius, convertDegreesToRadians(MASK.angles[0]), convertDegreesToRadians(MASK.angles[1]), false);
+    context.arc(0, MASK.upperY, MASK.radius, MASK.angles[0] * RADIAN, MASK.angles[1] * RADIAN, false);
     context.lineTo(MASK.radius, MASK.lowerY);
     context.lineTo(MASK.radius, MASK.size);
     context.lineTo(-MASK.size, MASK.size);
