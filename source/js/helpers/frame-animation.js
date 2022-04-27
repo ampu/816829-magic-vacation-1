@@ -112,8 +112,8 @@ export class FrameAnimation {
     return this.getStartTimestamp() > 0;
   }
 
-  start(startTimestamp) {
-    this._startTimestamp = startTimestamp || Date.now();
+  start(startTimestamp = Date.now()) {
+    this._startTimestamp = startTimestamp;
     if (this._shouldPreloadFirstFrame) {
       this._onFrame(performance.now(), false, false);
     }

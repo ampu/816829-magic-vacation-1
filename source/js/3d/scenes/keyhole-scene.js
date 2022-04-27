@@ -8,7 +8,7 @@ import {easeOutExpo, easeInOut} from 'helpers/easings';
 import {wrapObject} from '3d/helpers/object-helpers';
 import {generateIntegerByConstraint} from 'helpers/random-helpers';
 
-import {addKeyhole, START_ANIMATION_POSITION} from '3d/objects/keyhole';
+import {addKeyhole, START_ANIMATION_POSITION, Z_OFFSET} from '3d/objects/keyhole';
 import {addFlamingo} from '3d/objects/flamingo';
 import {addSnowflake} from '3d/objects/snowflake';
 import {addWatermelon} from '3d/objects/watermelon';
@@ -17,6 +17,8 @@ import {addAirplane} from '3d/objects/airplane';
 import {addQuestion} from '3d/objects/question';
 import {addKeyholeSaturn} from '3d/objects/saturn';
 import {addKeyholeLeaf} from '3d/objects/leaf';
+
+import {addDirectionalLight, addHemisphereLight, addLightGroup, addPointLight1, addPointLight2} from '3d/lights/lights';
 
 const OBJECT_NAME_TO_TIMELINE = {
   [``]: {delay: 1400, duration: 1200},
@@ -30,10 +32,21 @@ const BackgroundConstraint = {
   PERIOD: {min: 2000, max: 6000},
 };
 
+const KEYHOLE_SCENE_HEIGHT = 920;
 const DEFAULT_CAMERA_POSITION = {x: 0, y: 0, z: 1000};
+const KEYHOLE_SCENE_POSITION = [Math.sqrt((3270 - Z_OFFSET) ** 2 / 2), KEYHOLE_SCENE_HEIGHT, Math.sqrt((3270 - Z_OFFSET) ** 2 / 2)];
 
 export const addKeyholeScene = async (parent) => {
   const scene = new THREE.Group();
+  scene.name = ObjectName.KEYHOLE_SCENE;
+  scene.position.set(...KEYHOLE_SCENE_POSITION);
+  scene.rotation.y = Math.PI / 4;
+
+  const lightGroup = addLightGroup(scene, DEFAULT_CAMERA_POSITION);
+  addHemisphereLight(scene, lightGroup, DEFAULT_CAMERA_POSITION);
+  addDirectionalLight(scene, lightGroup, DEFAULT_CAMERA_POSITION);
+  addPointLight1(scene, lightGroup);
+  addPointLight2(scene, lightGroup);
 
   const [
     // eslint-disable-next-line no-unused-vars

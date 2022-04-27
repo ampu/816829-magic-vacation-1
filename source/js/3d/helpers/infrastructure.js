@@ -2,8 +2,8 @@ import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 
 import {containSize} from 'helpers/document-helpers';
-import {getGUI} from '3d/helpers/gui-helpers';
 import {StateStorage} from 'helpers/state-storage';
+import {rotateObjectInDegrees} from '3d/helpers/object-helpers';
 
 const ShadowsRequirement = {
   SCREEN_WIDTH: 1024,
@@ -13,10 +13,8 @@ const ShadowsRequirement = {
 const PLANE_SIZE = [2048, 1024];
 
 const CAMERA_CONFIG = {
-  fov: 35,
-  near: 0.1,
-  far: 10000,
-  position: {x: 0, y: 0, z: 1000},
+  position: [0, 0, 0],
+  lookAt: [0, 0, 0],
 };
 
 const AXIS_SIZE = 2000;
@@ -28,24 +26,31 @@ export class Infrastructure {
     canvas,
     cameraConfig = CAMERA_CONFIG,
     clearColor,
+    onBeforeRender,
+    onAfterRender,
   }) {
-    const [width, height] = calculateRendererSize(container);
-
     this.container = container;
-    this.cameraPositionStorage = new StateStorage(sessionStorage, `camera-position`);
-    this.defaultCameraPosition = this.cameraPositionStorage.getState(cameraConfig.position);
+    this.canvas = canvas;
+    const [width, height] = calculateRendererSize(container);
     this.renderer = createRenderer(canvas, width, height, clearColor);
-    this.camera = createCamera({...cameraConfig, position: this.defaultCameraPosition, width, height});
-    this.scene = createScene(canvas, this.camera);
-    this.orbit = addOrbit(canvas, this.camera);
+    this.scene = createScene();
+
+    this.cameraConfigStorage = new StateStorage(sessionStorage, `camera-config`);
+    this.cameraConfig = this.cameraConfigStorage.getState(cameraConfig);
+    this.camera = createCamera({...cameraConfig, width, height});
+    this.scene.add(this.camera);
+    setupCamera(this.camera, this.cameraConfig);
+    this.orbit = resetOrbit(this.orbit, this.canvas, this.camera);
 
     this.shouldResize = false;
     window.addEventListener(`resize`, () => {
       this.shouldResize = true;
     });
 
+    this.onBeforeRender = onBeforeRender;
+    this.onAfterRender = onAfterRender;
     this.run = this.run.bind(this);
-    this.setDefaultCameraPosition = this.setDefaultCameraPosition.bind(this);
+    this.setCameraConfig = this.setCameraConfig.bind(this);
     this.resetCamera = this.resetCamera.bind(this);
   }
 
@@ -59,17 +64,24 @@ export class Infrastructure {
       resizeInfrastructure(this.renderer, this.camera, width, height);
       this.shouldResize = false;
     }
-    this.cameraPositionStorage.setState(this.camera.position);
+    if (this.onBeforeRender) {
+      this.onBeforeRender();
+    }
     this.renderer.render(this.scene, this.camera);
+    if (this.onAfterRender) {
+      this.onAfterRender();
+    }
+    this.cameraConfigStorage.setState(this.cameraConfig);
     requestAnimationFrame(this.run);
   }
 
-  setDefaultCameraPosition(defaultCameraPosition) {
-    this.defaultCameraPosition = defaultCameraPosition;
+  setCameraConfig(cameraConfig) {
+    this.cameraConfig = cameraConfig;
   }
 
   resetCamera() {
-    this.orbit = resetCamera(this.renderer.domElement, this.camera, this.defaultCameraPosition, this.orbit);
+    setupCamera(this.camera, this.cameraConfig);
+    // this.orbit = resetOrbit(this.orbit, this.canvas, this.camera);
   }
 }
 
@@ -80,21 +92,20 @@ const calculateRendererSize = (container) => {
 const createRenderer = (canvas, width, height, clearColor = 0x000000) => {
   [width, height] = containSize(PLANE_SIZE, [width, height]);
 
+  const parameters = {
+    canvas,
+    logarithmicDepthBuffer: true,
+    antialias: true,
+    powerPreference: `high-performance`,
+  };
+
   const renderer = typeof WebGLDebugUtils !== `undefined`
     ? new THREE.WebGLRenderer({
-      canvas,
+      ...parameters,
       /* eslint-disable-next-line no-undef */
       context: WebGLDebugUtils.makeDebugContext(canvas.getContext(`webgl`)),
-      logarithmicDepthBuffer: true,
-      antialias: true,
-      powerPreference: `high-performance`,
     })
-    : new THREE.WebGLRenderer({
-      canvas,
-      logarithmicDepthBuffer: true,
-      antialias: true,
-      powerPreference: `high-performance`,
-    });
+    : new THREE.WebGLRenderer(parameters);
 
   renderer.shadowMap.enabled = window.innerWidth >= ShadowsRequirement.SCREEN_WIDTH
     && navigator.hardwareConcurrency >= ShadowsRequirement.HARDWARE_CONCURRENCY;
@@ -108,23 +119,22 @@ const createRenderer = (canvas, width, height, clearColor = 0x000000) => {
   return renderer;
 };
 
-const createCamera = ({fov, near, far, position, width, height}) => {
-  const camera = new THREE.PerspectiveCamera(fov, width / height, near, far);
-  camera.lookAt(0, 0, 0);
-  camera.position.copy(position);
-  return camera;
+const createCamera = ({fov = 35, near = 0.1, far = 10000, width, height}) => {
+  return new THREE.PerspectiveCamera(fov, width / height, near, far);
 };
 
-const resetCamera = (canvas, camera, cameraPosition, orbit) => {
-  camera.position.copy(cameraPosition);
-  camera.rotation.set(0, 0, 0);
-
-  getGUI().controllersRecursive().forEach((controller) => {
-    controller.reset();
-  });
-
-  orbit.dispose();
-  return addOrbit(canvas, camera);
+const setupCamera = (camera, {position, rotation, lookAt}) => {
+  if (position) {
+    camera.position.set(...position);
+  }
+  if (rotation) {
+    rotateObjectInDegrees(camera, rotation);
+  }
+  if (lookAt && camera.parent) {
+    camera.parent.updateWorldMatrix(true, false);
+    const target = camera.parent.localToWorld(new THREE.Vector3(...lookAt));
+    camera.lookAt(target);
+  }
 };
 
 const createScene = () => {
@@ -143,11 +153,14 @@ const resizeInfrastructure = (renderer, camera, width, height) => {
   renderer.setSize(width, height);
 };
 
-const addOrbit = (canvas, camera) => {
-  const controls = new OrbitControls(camera, canvas);
-  controls.target.set(0, 0, 0);
-  controls.update();
-  return controls;
+const resetOrbit = (orbit, canvas, camera) => {
+  if (orbit) {
+    orbit.dispose();
+  }
+  orbit = new OrbitControls(camera, canvas);
+  orbit.target.set(0, 0, 0);
+  orbit.update();
+  return orbit;
 };
 
 const addGridHelpers = (scene) => {

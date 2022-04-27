@@ -42,7 +42,7 @@ export default new SceneObject({
     state.save(context);
 
     context.beginPath();
-    context.arc(0, MASK.upperY, MASK.radius, MASK.angles[0] * RADIAN, MASK.angles[1] * RADIAN, false);
+    context.arc(0, MASK.upperY, MASK.radius, MASK.angles[0] / RADIAN, MASK.angles[1] / RADIAN, false);
     context.lineTo(MASK.radius, MASK.lowerY);
     context.lineTo(MASK.radius, MASK.size);
     context.lineTo(-MASK.size, MASK.size);

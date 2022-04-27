@@ -151,7 +151,7 @@ export class SceneObjectState {
   /** @param {CanvasRenderingContext2D} context */
   doRotate(context) {
     if (this.rotate !== 0) {
-      context.rotate(this.rotate * RADIAN);
+      context.rotate(this.rotate / RADIAN);
     }
   }
 

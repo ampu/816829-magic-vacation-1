@@ -35,20 +35,20 @@ import {easeLinear} from './easings';
 
 const {PI, E, sign, min, max, sin, cos, atan, pow, log} = Math;
 
-export const RADIAN = PI / 180;
+export const RADIAN = 180 / PI;
 const MAX_PROGRESS = 1;
 const DEFAULT_X_RANGE = [0, 1];
 const DEFAULT_Y_RANGE = [0, 1];
 const DEFAULT_VECTOR_Y_RANGE = [[0, 0, 0], [1, 1, 1]];
 
-export const convertDegreesToRadians = (degrees) => degrees * RADIAN;
-export const convertRadiansToDegrees = (radians) => radians / RADIAN;
+export const convertDegreesToRadians = (degrees) => degrees / RADIAN;
+export const convertRadiansToDegrees = (radians) => radians * RADIAN;
 export const convertTangentToDegrees = (tangent) => convertRadiansToDegrees(atan(tangent));
 
 export const calculateTangentY1 = (x0, y0, x1, dy0) => dy0 * (x1 - x0) + y0;
 
 export const rotatePoint = ([x, y], degrees = 0) => {
-  const radians = degrees * RADIAN;
+  const radians = degrees / RADIAN;
   const cosine = cos(radians);
   const sine = sin(radians);
   return [
@@ -116,7 +116,7 @@ export const createRotationCalculator = ({
     throw new Error(`createVectorCalculator(): minX (${minX}) shall not be more than maxX (${maxX})`);
   }
   return (x) => {
-    return startY.map((_, i) => calculateY(x, minX, maxX, startY[i], endY[i], onProgress) * RADIAN);
+    return startY.map((_, i) => calculateY(x, minX, maxX, startY[i], endY[i], onProgress) / RADIAN);
   };
 };
 

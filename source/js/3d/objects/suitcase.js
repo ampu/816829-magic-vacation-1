@@ -1,7 +1,5 @@
-import * as THREE from 'three';
 import {GLTFLoader} from 'three/examples/jsm/loaders/gltfloader';
 
-import {addRotationGUI, getGUI} from '3d/helpers/gui-helpers';
 import {centerObjectTransformOrigin, rotateObjectInDegrees, scaleObjectToFitHeight, setPolarPosition2} from '3d/helpers/object-helpers';
 import {ObjectName} from '3d/constants/object-name';
 import {wrapObject} from '3d/helpers/object-helpers';
@@ -77,10 +75,6 @@ export const addKeyholeSuitcase = async (parent) => {
     wrapper.position.x = getX(progress);
     wrapper.position.y = fromY + getY(progress);
     wrapper.position.z = getZ(progress);
-
-    for (const controller of rotationGUI.controllersRecursive()) {
-      controller.updateDisplay();
-    }
   };
 
   const [fromX, fromY, fromZ] = START_ANIMATION_POSITION;
@@ -88,9 +82,6 @@ export const addKeyholeSuitcase = async (parent) => {
   const object = await addSuitcase(parent, KEYHOLE_SUITCASE);
   centerObjectTransformOrigin(object, [`y`]);
   rotateObjectInDegrees(object, rotation.from);
-
-  const folder = getGUI().addFolder(`suitcase`);
-  const rotationGUI = addRotationGUI(folder, object.rotation);
 
   const wrapper = wrapObject(object);
   wrapper.name = ObjectName.SUITCASE;
@@ -109,29 +100,19 @@ export const addKeyholeSuitcase = async (parent) => {
   };
 };
 
-export const addHistorySuitcase = async (parent, title) => {
+export const addHistorySuitcase = async (parent, _title) => {
   const object = await addSuitcase(parent, HISTORY_SUITCASE);
 
   const wrapper = wrapObject(object);
   object.name = ObjectName.SUITCASE;
   setPolarPosition2(object, HISTORY_SUITCASE.polarRadius, HISTORY_SUITCASE.startAngle, `z`, `x`);
 
-  const folder = getGUI().addFolder(title);
-  folder.add({
-    get angle() {
-      return Math.round(THREE.MathUtils.radToDeg(object.rotation.y));
-    },
-    set angle(value) {
-      setPolarPosition2(object, HISTORY_SUITCASE.polarRadius, value, `z`, `x`);
-    },
-  }, `angle`, -360, 360, 1);
-
   const getY = createCalculator({yRange: [HISTORY_SUITCASE.height * HISTORY_SUITCASE.animationHeightRatio, 0]});
-  const [getScaleXZ, getScaleY] = HISTORY_SUITCASE.scales.slice(1).map((_, i) => {
-    return [
-      createCalculator({yRange: [1 - HISTORY_SUITCASE.scales[i] / 2, 1 - HISTORY_SUITCASE.scales[i + 1] / 2]}),
-      createCalculator({yRange: [1 + HISTORY_SUITCASE.scales[i], 1 + HISTORY_SUITCASE.scales[i + 1]]}),
-    ];
+  const getScaleY = HISTORY_SUITCASE.scales.slice(1).map((_, i) => {
+    return createCalculator({yRange: [1 + HISTORY_SUITCASE.scales[i], 1 + HISTORY_SUITCASE.scales[i + 1]]});
+  });
+  const getScaleXZ = HISTORY_SUITCASE.scales.slice(1).map((_, i) => {
+    return createCalculator({yRange: [1 - HISTORY_SUITCASE.scales[i] / 2, 1 - HISTORY_SUITCASE.scales[i + 1] / 2]});
   });
 
   parent.add(wrapper);

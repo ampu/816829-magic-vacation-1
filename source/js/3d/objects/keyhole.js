@@ -3,8 +3,8 @@ import * as THREE from 'three';
 import {loadSVGGroup} from '3d/helpers/svg-helpers';
 import {Material} from '3d/materials/materials';
 
-const PLANE_SIZE = 3000;
-const Z_OFFSET = -405;
+const PLANE_SIZE = 600;
+export const Z_OFFSET = -405;
 export const START_ANIMATION_POSITION = [0, 0, Z_OFFSET];
 
 const KEYHOLE = {
@@ -25,7 +25,7 @@ const addBackground = (parent) => {
   const geometry = new THREE.PlaneGeometry(PLANE_SIZE, PLANE_SIZE);
 
   const object = new THREE.Mesh(geometry, Material.BASIC_PURPLE);
-  object.position.z = -KEYHOLE.extrudeOptions.depth;
+  object.position.z = -KEYHOLE.extrudeOptions.depth - 200;
 
   parent.add(object);
   return object;

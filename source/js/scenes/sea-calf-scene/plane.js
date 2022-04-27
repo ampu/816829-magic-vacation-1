@@ -45,7 +45,7 @@ export default new SceneObject({
 
     state.save(context);
 
-    context.rotate(MOTION_ROTATE * RADIAN);
+    context.rotate(MOTION_ROTATE / RADIAN);
     state.transform(context);
     state.doRenderImage(context, image);
 

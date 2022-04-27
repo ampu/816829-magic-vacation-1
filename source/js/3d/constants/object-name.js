@@ -1,4 +1,5 @@
 export const ObjectName = {
+  KEYHOLE_SCENE: `keyhole-scene`,
   AIRPLANE: `airplane`,
   SUITCASE: `suitcase`,
   STATIC: `static`,
@@ -8,7 +9,6 @@ export const ObjectName = {
   ROAD: `road`,
   LAMPPOST: `lamppost`,
   SNOWMAN: `snowman`,
-  HISTORY: `history`,
   PILLARS: `pillars`,
 
   DOG: `dog`,
