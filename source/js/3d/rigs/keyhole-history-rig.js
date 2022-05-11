@@ -1,5 +1,5 @@
 import {NullRig} from '3d/rigs/null-rig';
-import {createCalculator, createRangesCalculator, createVectorCalculator} from 'helpers/calculator';
+import {createCalculator, createRangesCalculator, createVectorCalculator, RADIAN} from 'helpers/calculator';
 import {FrameAnimation} from 'helpers/frame-animation';
 import {easeInOut} from 'helpers/easings';
 
@@ -7,12 +7,17 @@ const THRESHOLD_PROGRESS = 0.5;
 const PROGRESS_STEP = 0.001;
 const MAX_ROTATION = 360;
 
-export const createKeyholeHistoryRig = (target, {
+export const createKeyholeHistoryRig = ({
+  parent,
+  background,
+  suitcase,
+  lights,
+  pointLights,
   radiusRange: [historyRadius, thresholdRadius, keyholeRadius],
   heightRange: [historyHeight, keyholeHeight],
   targetLookRange: [historyLook, keyholeLook],
 }) => {
-  const nullRig = new NullRig(target);
+  const nullRig = new NullRig(parent);
 
   const getRadius = createRangesCalculator([
     {xRange: [0, THRESHOLD_PROGRESS], yRange: [historyRadius, thresholdRadius]},
@@ -21,6 +26,10 @@ export const createKeyholeHistoryRig = (target, {
   const getHeight = createCalculator({xRange: [0, THRESHOLD_PROGRESS], yRange: [historyHeight, keyholeHeight]});
   const getTargetLook = createVectorCalculator({xRange: [THRESHOLD_PROGRESS - PROGRESS_STEP, THRESHOLD_PROGRESS], yRange: [historyLook, keyholeLook]});
   const getOrbitRotationY = createCalculator({xRange: [0, 4], yRange: [0, MAX_ROTATION]});
+  const getBackgroundOpacity = createRangesCalculator([
+    {xRange: [0.1, 0.3], yRange: [1, 0]},
+    {xRange: [0.5, 0.7], yRange: [0, 1]},
+  ]);
 
   const createHistoryAnimation = (historySceneIndex, duration) => {
     const startRotation = nullRig.getOrbitRotation();
@@ -40,7 +49,10 @@ export const createKeyholeHistoryRig = (target, {
       duration,
       onProgress: easeInOut,
       onRenderFrame({progress}) {
-        nullRig.setOrbitRotationY(progress >= 1 ? endRotation : getAnimationOrbitRotationY(progress));
+        const rotationY = progress >= 1 ? endRotation : getAnimationOrbitRotationY(progress);
+        suitcase.rotation.y = rotationY / RADIAN;
+
+        nullRig.setOrbitRotationY(rotationY);
         nullRig.invalidate();
       },
     });
@@ -57,11 +69,24 @@ export const createKeyholeHistoryRig = (target, {
         nullRig.setHeight(getHeight(t));
         nullRig.setTargetLook(getTargetLook(t));
         nullRig.invalidate();
+
+        background.material.opacity = getBackgroundOpacity(t);
+
+        if (t === 0) {
+          if (isForward) {
+            lights.remove(pointLights);
+          } else {
+            lights.add(pointLights);
+          }
+        }
       },
     });
   };
 
   return {
+    getTarget() {
+      return nullRig.getTarget();
+    },
     invalidate() {
       nullRig.invalidate();
     },

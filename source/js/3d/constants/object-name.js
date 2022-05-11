@@ -1,5 +1,11 @@
 export const ObjectName = {
+  DIRECTIONAL_LIGHT: `directional-light`,
+  POINT_LIGHTS: `point-lights`,
+  POINT_LIGHT1: `point-light1`,
+  POINT_LIGHT2: `point-light2`,
+
   KEYHOLE_SCENE: `keyhole-scene`,
+  KEYHOLE_BACKGROUND: `keyhole-background`,
   AIRPLANE: `airplane`,
   SUITCASE: `suitcase`,
   STATIC: `static`,

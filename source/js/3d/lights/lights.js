@@ -1,70 +1,84 @@
 import * as THREE from 'three';
 
-export const addLightGroup = (parent, {x, y, z}) => {
-  const group = new THREE.Group();
-  group.position.set(x, y, z);
-  parent.add(group);
+import {addGroup, findRoot} from '3d/helpers/object-helpers';
+import {RADIAN} from 'helpers/calculator';
+import {Color} from '3d/materials/materials';
+import {ObjectName} from '3d/constants/object-name';
+
+/** @enum {object} */
+const LightConfig = {
+  DIRECTIONAL: {
+    name: ObjectName.DIRECTIONAL_LIGHT,
+    args: [`rgb(255, 255, 255)`, 0.84],
+    position: [0, 0, 0],
+    targetPosition: [0, -1000 * Math.tan(15 / RADIAN), 1000],
+  },
+  POINT1: {
+    name: ObjectName.POINT_LIGHT1,
+    args: [`rgb(246, 242, 255)`, 0.6, 975, 2],
+    position: [-785, -350, 710],
+  },
+  POINT2: {
+    name: ObjectName.POINT_LIGHT2,
+    args: [`rgb(245, 254, 255)`, 0.95, 975, 2],
+    position: [730, 800, 985],
+  },
+};
+
+export const addCameraLights = (parent) => {
+  const scene = findRoot(parent);
+  const group = addGroup(parent);
+
+  addDirectionalLight(scene, group, LightConfig.DIRECTIONAL);
+
+  const pointLights = addGroup(group, ObjectName.POINT_LIGHTS);
+  addPointLight(scene, pointLights, LightConfig.POINT1);
+  addPointLight(scene, pointLights, LightConfig.POINT2);
   return group;
 };
 
-export const addHemisphereLight = (scene, parent, {x, y, z}) => {
-  const light = new THREE.HemisphereLight(0xaaaaff, 0xaaffaa, 0.5);
-  light.position.set(-x, -y, -z);
-  parent.add(light);
+const addDirectionalLight = (scene, parent, {name, args, position, targetPosition}) => {
+  const light = new THREE.DirectionalLight(...args);
+  light.name = name;
+  light.position.set(...position);
+  light.target.position.set(...targetPosition);
 
-  const helper = new THREE.HemisphereLightHelper(light, 50);
-  scene.add(helper);
+  castShadow(light);
 
-  return light;
-};
-
-export const addDirectionalLight = (scene, parent, {x, y, z}) => {
-  const light = new THREE.DirectionalLight(`rgb(255, 255, 255)`, 0.84);
-  light.target.position.set(-x, -y, -z);
-  light.target.position.y -= z * Math.tan(THREE.MathUtils.degToRad(15));
-  light.target.updateMatrixWorld();
+  const geometry = new THREE.SphereGeometry(30);
+  const material = new THREE.MeshStandardMaterial({
+    color: Color.WHITE,
+    transparent: true,
+    opacity: 0.5,
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(...targetPosition);
 
   parent.add(light);
   parent.add(light.target);
+  parent.add(mesh);
 
-  const helper = new THREE.DirectionalLightHelper(light, 50);
-  scene.add(helper);
-
+  scene.add(new THREE.DirectionalLightHelper(light, 50));
   return light;
 };
 
-export const addPointLight1 = (scene, parent) => {
-  const light = new THREE.PointLight(`rgb(246, 242, 255)`, 0.6, 1975, 2.0);
-  light.position.set(-785, -350, -710);
+const addPointLight = (scene, parent, {name, args, position}) => {
+  const light = new THREE.PointLight(...args);
+  light.name = name;
+  light.position.set(...position);
 
+  castShadow(light);
+
+  parent.add(light);
+
+  scene.add(new THREE.PointLightHelper(light, 50));
+  return light;
+};
+
+const castShadow = (light) => {
   light.castShadow = true;
   light.shadow.mapSize.width = 512;
   light.shadow.mapSize.height = 512;
   light.shadow.camera.near = 0.5;
   light.shadow.camera.far = 500;
-
-  parent.add(light);
-
-  const helper = new THREE.PointLightHelper(light, 50);
-  scene.add(helper);
-
-  return light;
-};
-
-export const addPointLight2 = (scene, parent) => {
-  const light = new THREE.PointLight(`rgb(245, 254, 255)`, 0.95, 1975, 2.0);
-  light.position.set(730, 800, -985);
-
-  light.castShadow = true;
-  light.shadow.mapSize.width = 512;
-  light.shadow.mapSize.height = 512;
-  light.shadow.camera.near = 0.5;
-  light.shadow.camera.far = 500;
-
-  parent.add(light);
-
-  const helper = new THREE.PointLightHelper(light, 50);
-  scene.add(helper);
-
-  return light;
 };

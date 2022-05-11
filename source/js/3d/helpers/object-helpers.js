@@ -75,6 +75,14 @@ export const findChildren = (object, names) => {
   });
 };
 
+export const findRoot = (object) => {
+  let root = object;
+  while (root.parent) {
+    root = root.parent;
+  }
+  return root;
+};
+
 export const forEachMeshInChildren = (parentObject, childNames, callback) => {
   for (const object of findChildren(parentObject, childNames)) {
     forEachMesh(object, callback);
@@ -97,6 +105,15 @@ export const receiveShadow = (parentObject, childNames) => {
   forEachMeshInChildren(parentObject, childNames, (mesh) => {
     mesh.receiveShadow = true;
   });
+};
+
+export const addGroup = (parent, name = undefined) => {
+  const group = new THREE.Group();
+  if (name !== undefined) {
+    group.name = name;
+  }
+  parent.add(group);
+  return group;
 };
 
 /**

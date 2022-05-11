@@ -18,8 +18,6 @@ import {addQuestion} from '3d/objects/question';
 import {addKeyholeSaturn} from '3d/objects/saturn';
 import {addKeyholeLeaf} from '3d/objects/leaf';
 
-import {addDirectionalLight, addHemisphereLight, addLightGroup, addPointLight1, addPointLight2} from '3d/lights/lights';
-
 const OBJECT_NAME_TO_TIMELINE = {
   [``]: {delay: 1400, duration: 1200},
   [ObjectName.AIRPLANE]: {delay: 2300, duration: 900},
@@ -41,12 +39,6 @@ export const addKeyholeScene = async (parent) => {
   scene.name = ObjectName.KEYHOLE_SCENE;
   scene.position.set(...KEYHOLE_SCENE_POSITION);
   scene.rotation.y = Math.PI / 4;
-
-  const lightGroup = addLightGroup(scene, DEFAULT_CAMERA_POSITION);
-  addHemisphereLight(scene, lightGroup, DEFAULT_CAMERA_POSITION);
-  addDirectionalLight(scene, lightGroup, DEFAULT_CAMERA_POSITION);
-  addPointLight1(scene, lightGroup);
-  addPointLight2(scene, lightGroup);
 
   const [
     // eslint-disable-next-line no-unused-vars

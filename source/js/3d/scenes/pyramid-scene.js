@@ -4,7 +4,6 @@ import {ObjectName} from '3d/constants/object-name';
 import {castShadow, receiveShadow} from '3d/helpers/object-helpers';
 
 import {addPyramid} from '3d/objects/pyramid';
-import {addHistorySuitcase} from '3d/objects/suitcase';
 import {addLamppost} from '3d/objects/lamppost';
 import {addPyramidWall} from '3d/objects/wall';
 import {addPyramidFloor} from '3d/objects/floor';
@@ -24,7 +23,6 @@ export const addPyramidScene = async (parent, yRotation) => {
     addPyramidBigLeaf(scene),
     addPyramidSmallLeaf(scene),
     addPyramid(scene),
-    addHistorySuitcase(scene, `Pyramid Suitcase`),
     addLamppost(scene),
     addPyramidWall(scene),
     addPyramidFloor(scene),
@@ -38,7 +36,6 @@ export const addPyramidScene = async (parent, yRotation) => {
   ]);
 
   castShadow(scene, [
-    ObjectName.SUITCASE,
     ObjectName.STATIC,
     ObjectName.LAMPPOST,
     ObjectName.BIG_LEAF,

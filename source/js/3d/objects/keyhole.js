@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 import {loadSVGGroup} from '3d/helpers/svg-helpers';
 import {Material} from '3d/materials/materials';
+import {ObjectName} from '3d/constants/object-name';
 
 const PLANE_SIZE = 600;
 export const Z_OFFSET = -405;
@@ -24,7 +25,11 @@ const KEYHOLE = {
 const addBackground = (parent) => {
   const geometry = new THREE.PlaneGeometry(PLANE_SIZE, PLANE_SIZE);
 
-  const object = new THREE.Mesh(geometry, Material.BASIC_PURPLE);
+  const material = Material.BASIC_PURPLE.clone();
+  material.transparent = true;
+
+  const object = new THREE.Mesh(geometry, material);
+  object.name = ObjectName.KEYHOLE_BACKGROUND;
   object.position.z = -KEYHOLE.extrudeOptions.depth - 200;
 
   parent.add(object);

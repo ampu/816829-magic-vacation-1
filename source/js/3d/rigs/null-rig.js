@@ -1,11 +1,14 @@
+import * as THREE from 'three';
+
 import {RADIAN} from 'helpers/calculator';
 import {wrapObject} from '3d/helpers/object-helpers';
 
 export class NullRig {
-  constructor(target) {
-    this._target = target;
-    this._orbit = wrapObject(target);
+  constructor(parent) {
+    this._target = new THREE.Group();
+    this._orbit = wrapObject(this._target);
     this._root = wrapObject(this._orbit);
+    parent.add(this._root);
 
     this._targetPosition = this._target.position.clone();
     this._isTargetPositionChanged = false;
@@ -19,6 +22,10 @@ export class NullRig {
 
   getRoot() {
     return this._root;
+  }
+
+  getTarget() {
+    return this._target;
   }
 
   getRadius() {

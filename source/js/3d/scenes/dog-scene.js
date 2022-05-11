@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import {addHistorySuitcase} from '3d/objects/suitcase';
 import {addDogCarpet} from '3d/objects/carpet';
 import {addDogSaturn} from '3d/objects/saturn';
 import {addDogWall} from '3d/objects/wall';
@@ -16,11 +15,10 @@ export const addDogScene = async (parent, yRotation) => {
   scene.rotateY(yRotation);
 
   const [
-    suitcase,
+    // suitcase,
     dog,
     saturn,
   ] = await Promise.all([
-    addHistorySuitcase(scene, `Dog suitcase`),
     addDog(scene),
     addDogSaturn(scene),
     addDogCarpet(scene),
@@ -36,7 +34,7 @@ export const addDogScene = async (parent, yRotation) => {
   ]);
 
   castShadow(scene, [
-    ObjectName.SUITCASE,
+    // ObjectName.SUITCASE,
     ObjectName.STATIC,
     ObjectName.DOG,
   ]);
@@ -45,7 +43,7 @@ export const addDogScene = async (parent, yRotation) => {
   return {
     scene,
     animation: new CompositeAnimation([
-      suitcase.animation,
+      // suitcase.animation,
       dog.animation,
       saturn.animation,
     ]),

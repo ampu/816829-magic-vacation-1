@@ -13,6 +13,9 @@ import {addSonyaScene} from '3d/scenes/sonya-scene';
 import {addKeyholeScene} from '3d/scenes/keyhole-scene';
 import {createKeyholeHistoryRig} from './rigs/keyhole-history-rig';
 import {Z_OFFSET} from '3d/objects/keyhole';
+import {ObjectName} from '3d/constants/object-name';
+import {addHistorySuitcase} from '3d/objects/suitcase';
+import {addCameraLights} from '3d/lights/lights';
 
 const SceneKey = {
   KEYHOLE: `keyhole`,
@@ -72,7 +75,7 @@ const getSceneKeyByIndex = (index) => {
 };
 
 export default async () => {
-  const {scene, camera, run, resetCamera} = new Infrastructure({
+  const {scene, cameraMock: camera, run, resetCamera} = new Infrastructure({
     container: document.querySelector(`.animation-screen`),
     canvas: document.querySelector(`.animation-screen canvas`),
     onBeforeRender() {
@@ -81,11 +84,15 @@ export default async () => {
     },
   });
 
+  const lights = addCameraLights(scene);
+  const pointLights = lights.getObjectByName(ObjectName.POINT_LIGHTS);
+
   const state = {
     sceneKey: undefined,
     sceneKeyToState: {},
     isPending: false,
     cameraRig: undefined,
+    suitcaseState: undefined,
   };
 
   const createPendingHelper = (shouldAdherePending) => {
@@ -120,6 +127,10 @@ export default async () => {
     const startSceneParameter = SCENE_KEY_TO_PARAMETER[previousSceneKey];
     const endSceneParameter = SCENE_KEY_TO_PARAMETER[sceneKey];
 
+    // eslint-disable-next-line no-unused-vars
+    const startSceneState = state.sceneKeyToState[previousSceneKey];
+    const endSceneState = state.sceneKeyToState[sceneKey];
+
     const hasMiddlePoint = !!(previousSceneKey !== MIDDLE_SCENE_KEY
       && sceneKey !== MIDDLE_SCENE_KEY
       && startSceneParameter
@@ -149,7 +160,14 @@ export default async () => {
       state.cameraRig.setHeightProgress(progress);
       state.cameraRig.setTargetLookProgress(progress);
       state.cameraRig.setHistorySceneIndex(endSceneParameter.historySceneIndex || 0);
+
+      if (!endSceneParameter.isHistory) {
+        lights.remove(pointLights);
+      }
     }
+
+    endSceneState.animation.stop();
+    endSceneState.animation.start();
 
     state.sceneKey = sceneKey;
     currentSceneKeyStorage.setState(sceneKey);
@@ -160,6 +178,9 @@ export default async () => {
   };
 
   await Promise.all([
+    addHistorySuitcase(scene).then((suitcaseState) => {
+      state.suitcaseState = suitcaseState;
+    }),
     addKeyholeScene(scene).then((sceneState) => {
       state.sceneKeyToState[SceneKey.KEYHOLE] = sceneState;
     }),
@@ -182,10 +203,25 @@ export default async () => {
   const keyholeScene = state.sceneKeyToState[SceneKey.KEYHOLE].scene;
   const dogScene = state.sceneKeyToState[SceneKey.DOG].scene;
 
-  camera.position.set(...HISTORY_CAMERA.position);
-  window.camera = camera;
+  const helper = new THREE.CameraHelper(camera);
+  scene.add(helper);
 
-  state.cameraRig = createKeyholeHistoryRig(camera, {
+  camera.position.set(0, 0, 0);
+  camera.rotation.set(Math.PI, 0, Math.PI);
+
+  Object.assign(window, {
+    scene,
+    camera,
+    THREE,
+    state,
+  });
+
+  state.cameraRig = createKeyholeHistoryRig({
+    parent: scene,
+    background: state.sceneKeyToState[SceneKey.KEYHOLE].scene.getObjectByName(ObjectName.KEYHOLE_BACKGROUND),
+    suitcase: state.suitcaseState.object,
+    lights,
+    pointLights,
     radiusRange: [
       dogScene.localToWorld(new THREE.Vector3(...HISTORY_CAMERA.position)).length(),
       keyholeScene.localToWorld(new THREE.Vector3(0, 0, Z_OFFSET)).length(),
@@ -200,6 +236,10 @@ export default async () => {
       keyholeScene.localToWorld(new THREE.Vector3(...KEYHOLE_CAMERA.look)).toArray(),
     ],
   });
+
+  state.cameraRig.getTarget()
+    .add(camera)
+    .add(lights);
 
   await setCurrentScene(currentSceneKeyStorage.getState(DEFAULT_SCENE_KEY), false);
 

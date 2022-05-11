@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import {addSonyaCarpet} from '3d/objects/carpet';
-import {addHistorySuitcase} from '3d/objects/suitcase';
 import {addSonyaSaturn} from '3d/objects/saturn';
 import {addSonyaWall} from '3d/objects/wall';
 import {addSonyaFloor} from '3d/objects/floor';
@@ -19,7 +18,6 @@ export const addSonyaScene = async (parent, yRotation) => {
   ] = await Promise.all([
     addSonya(scene),
     addSonyaCarpet(scene),
-    addHistorySuitcase(scene, `Sonya Suitcase`),
     addSonyaSaturn(scene),
     addSonyaWall(scene),
     addSonyaFloor(scene),
@@ -36,7 +34,6 @@ export const addSonyaScene = async (parent, yRotation) => {
   castShadow(scene, [
     ObjectName.STATIC,
     ObjectName.SONYA,
-    ObjectName.SUITCASE,
   ]);
 
   parent.add(scene);

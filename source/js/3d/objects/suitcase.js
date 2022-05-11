@@ -102,6 +102,7 @@ export const addKeyholeSuitcase = async (parent) => {
 
 export const addHistorySuitcase = async (parent, _title) => {
   const object = await addSuitcase(parent, HISTORY_SUITCASE);
+  object.castShadow = true;
 
   const wrapper = wrapObject(object);
   object.name = ObjectName.SUITCASE;

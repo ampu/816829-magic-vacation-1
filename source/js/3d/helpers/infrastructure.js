@@ -13,7 +13,7 @@ const ShadowsRequirement = {
 const PLANE_SIZE = [2048, 1024];
 
 const CAMERA_CONFIG = {
-  position: [0, 0, 0],
+  position: [1500, 800, 1500],
   lookAt: [0, 0, 0],
 };
 
@@ -36,9 +36,14 @@ export class Infrastructure {
     this.scene = createScene();
 
     this.cameraConfigStorage = new StateStorage(sessionStorage, `camera-config`);
-    this.cameraConfig = this.cameraConfigStorage.getState(cameraConfig);
+    this.cameraConfig = cameraConfig;
+
+    this.cameraMock = createCamera({...cameraConfig, width, height});
+    this.scene.add(this.cameraMock);
+
     this.camera = createCamera({...cameraConfig, width, height});
     this.scene.add(this.camera);
+
     setupCamera(this.camera, this.cameraConfig);
     this.orbit = resetOrbit(this.orbit, this.canvas, this.camera);
 
@@ -80,8 +85,9 @@ export class Infrastructure {
   }
 
   resetCamera() {
+    setupCamera(this.cameraMock, this.cameraConfig);
     setupCamera(this.camera, this.cameraConfig);
-    // this.orbit = resetOrbit(this.orbit, this.canvas, this.camera);
+    this.orbit = resetOrbit(this.orbit, this.canvas, this.camera);
   }
 }
 
