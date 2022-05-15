@@ -89,6 +89,7 @@ export class FrameAnimation {
 
     this._delayTimer = 0;
     this._startTimestamp = 0;
+    this._isFirstFrameRendered = false;
     this._latestAnimationFrameId = 0;
     this._latestRenderState = null;
 
@@ -117,6 +118,7 @@ export class FrameAnimation {
       return;
     }
     this._startTimestamp = startTimestamp;
+    this._isFirstFrameRendered = false;
     if (this._shouldPreloadFirstFrame) {
       this._onFrame(performance.now(), false, false);
     }
@@ -125,6 +127,7 @@ export class FrameAnimation {
 
   stop() {
     this._startTimestamp = 0;
+    this._isFirstFrameRendered = false;
 
     if (this._delayTimer > 0) {
       clearTimeout(this._delayTimer);
@@ -147,7 +150,10 @@ export class FrameAnimation {
   }
 
   _onFrame(performanceNow, shouldRequestNextFrameIfNeeded, shouldSkipDuplicates) {
-    const currentTimestamp = TIME_ORIGIN + Math.trunc(performanceNow);
+    const currentTimestamp = this._isFirstFrameRendered
+      ? TIME_ORIGIN + Math.trunc(performanceNow)
+      : this._startTimestamp;
+
     const elapsed = calculateElapsed(currentTimestamp, this._startTimestamp, this._delay);
     const iteration = calculateIteration(elapsed, this._duration);
     const progress = this._onProgress(calculateProgress(elapsed, this._duration, this._shouldAlternate));
@@ -174,6 +180,7 @@ export class FrameAnimation {
     };
 
     const canContinue = this._onRenderFrame(this._latestRenderState, this._userState) !== false;
+    this._isFirstFrameRendered = true;
 
     if (canContinue) {
       if (progress < MAX_PROGRESS || this._shouldAlternate) {

@@ -37,16 +37,43 @@ const findAncestor = (element, selector) => {
   return null;
 };
 
-const isPortrait = () => {
-  return (window.innerWidth / window.innerHeight) <= 1;
+const isPortrait = (viewport = window.innerWidth) => {
+  return (viewport / window.innerHeight) <= 1;
 };
 
-const isMobileOrPortrait = () => {
-  return window.innerWidth < Viewport.TABLET || isPortrait();
+const isMobileOrPortrait = (viewport = window.innerWidth) => {
+  return viewport < Viewport.TABLET || isPortrait();
 };
 
-const isStopScaling = () => {
-  return window.innerWidth >= Viewport.STOP_SCALING;
+const isStopScaling = (viewport = window.innerWidth) => {
+  return viewport >= Viewport.STOP_SCALING;
+};
+
+const addViewportListeners = (listeners) => {
+  const states = new Array(listeners.length);
+
+  const initialViewport = window.innerWidth;
+  listeners.forEach(([getValue, onChange, shouldNotifyInitially = true], index) => {
+    const value = getValue(initialViewport);
+    if (shouldNotifyInitially) {
+      onChange(value, undefined);
+    }
+    states[index] = value;
+  });
+  const onWindowResize = () => {
+    const viewport = window.innerWidth;
+    listeners.forEach(([getValue, onChange], index) => {
+      const value = getValue(viewport);
+      if (states[index] !== value) {
+        onChange(value, states[index]);
+        states[index] = value;
+      }
+    });
+  };
+  window.addEventListener(`resize`, onWindowResize);
+  return () => {
+    window.removeEventListener(`resize`, onWindowResize);
+  };
 };
 
 const sleep = (timeout) => {
@@ -111,6 +138,7 @@ export {
   isPortrait,
   isMobileOrPortrait,
   isStopScaling,
+  addViewportListeners,
   sleep,
   addClassToken,
   reloadSvg,

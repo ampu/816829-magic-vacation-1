@@ -131,5 +131,8 @@ export const addKeyholeScene = async (parent) => {
     defaultCameraPosition: DEFAULT_CAMERA_POSITION,
     scene,
     animation,
+    update(_sceneWidth) {
+      // TODO: implement update based on sceneWidth
+    },
   };
 };

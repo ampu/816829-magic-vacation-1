@@ -4,7 +4,7 @@ import {StateStorage} from 'helpers/state-storage';
 import {addKeyboardListener, KeyboardKey} from 'helpers/keyboard-helpers';
 import {getGUI} from '3d/helpers/gui-helpers';
 import {Infrastructure} from '3d/helpers/infrastructure';
-import {sleep} from 'helpers/document-helpers';
+import {addViewportListeners, isPortrait as calculateIsPortrait, sleep} from 'helpers/document-helpers';
 
 import {addDogScene} from '3d/scenes/dog-scene';
 import {addPyramidScene} from '3d/scenes/pyramid-scene';
@@ -33,13 +33,17 @@ const SCENE_KEYS = Object.values(SceneKey);
 const HISTORY_CAMERA_RADIUS = 2550;
 const HISTORY_CAMERA_HEIGHT = 800;
 const HISTORY_CAMERA_RADIUS_XZ = Math.sqrt(HISTORY_CAMERA_RADIUS ** 2 - HISTORY_CAMERA_HEIGHT ** 2);
+
 const HISTORY_CAMERA_POSITION = [Math.sqrt(HISTORY_CAMERA_RADIUS_XZ ** 2 / 2), HISTORY_CAMERA_HEIGHT, Math.sqrt(HISTORY_CAMERA_RADIUS_XZ ** 2 / 2)];
 const HISTORY_CAMERA_LOOK = [0, 130, 0];
+
+const PORTRAIT_HISTORY_CAMERA_POSITION = [Math.sqrt(HISTORY_CAMERA_RADIUS_XZ ** 2 / 2) - 150, HISTORY_CAMERA_HEIGHT, Math.sqrt(HISTORY_CAMERA_RADIUS_XZ ** 2 / 2)];
+const PORTRAIT_HISTORY_CAMERA_LOOK = [0, 160, 0];
 
 const BASE_ANIMATION_DURATION = 1000;
 
 const HISTORY_CAMERA = {
-  position: HISTORY_CAMERA_POSITION,
+  position: PORTRAIT_HISTORY_CAMERA_POSITION,
   look: HISTORY_CAMERA_LOOK,
 };
 
@@ -75,7 +79,7 @@ const getSceneKeyByIndex = (index) => {
 };
 
 export default async () => {
-  const {scene, cameraMock: camera, run, resetCamera} = new Infrastructure({
+  const {scene, camera, run} = new Infrastructure({
     container: document.querySelector(`.animation-screen`),
     canvas: document.querySelector(`.animation-screen canvas`),
     onBeforeRender() {
@@ -93,6 +97,7 @@ export default async () => {
     isPending: false,
     cameraRig: undefined,
     suitcaseState: undefined,
+    isMouseEnabled: false,
   };
 
   const createPendingHelper = (shouldAdherePending) => {
@@ -203,8 +208,7 @@ export default async () => {
   const keyholeScene = state.sceneKeyToState[SceneKey.KEYHOLE].scene;
   const dogScene = state.sceneKeyToState[SceneKey.DOG].scene;
 
-  const helper = new THREE.CameraHelper(camera);
-  scene.add(helper);
+  // scene.add(new THREE.CameraHelper(camera));
 
   camera.position.set(0, 0, 0);
   camera.rotation.set(Math.PI, 0, Math.PI);
@@ -254,17 +258,26 @@ export default async () => {
 
   addKeyboardListener({
     [KeyboardKey.ESCAPE]: () => {
-      resetCamera();
+      state.isMouseEnabled = !state.isMouseEnabled;
+      if (!state.isMouseEnabled) {
+        state.cameraRig.setCursorRotationProgress([0, 0]);
+      }
     },
     [KeyboardKey.TAB]: (evt) => {
       evt.preventDefault();
       const sceneIndex = SCENE_KEYS.indexOf(state.sceneKey) + (evt.shiftKey ? -1 : 1);
-      setCurrentScene(getSceneKeyByIndex(sceneIndex), true);
+      setCurrentScene(getSceneKeyByIndex(sceneIndex));
+    },
+    [KeyboardKey.P]: () => {
+      // TODO: change position
+    },
+    [KeyboardKey.L]: () => {
+      // TODO: change look
     },
   });
 
   document.addEventListener(`mousemove`, (evt) => {
-    if (state.isPending) {
+    if (state.isPending || !state.isMouseEnabled) {
       return;
     }
     const maxOffsetX = window.innerWidth / 2;
@@ -274,6 +287,11 @@ export default async () => {
       (evt.clientY - maxOffsetY) / maxOffsetY,
     ]);
   });
+
+  addViewportListeners([
+    [calculateIsPortrait, (_isPortrait) => {
+    }]
+  ]);
 
   run();
 };

@@ -37,6 +37,21 @@ export const addCameraLights = (parent) => {
   return group;
 };
 
+const addDirectionalLightTargetHelper = (parent, targetPosition) => {
+  const geometry = new THREE.SphereGeometry(30);
+  const material = new THREE.MeshStandardMaterial({
+    color: Color.WHITE,
+    transparent: true,
+    opacity: 0.5,
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(...targetPosition);
+
+  parent.add(mesh);
+  return mesh;
+};
+
 const addDirectionalLight = (scene, parent, {name, args, position, targetPosition}) => {
   const light = new THREE.DirectionalLight(...args);
   light.name = name;
@@ -45,18 +60,10 @@ const addDirectionalLight = (scene, parent, {name, args, position, targetPositio
 
   castLightShadow(light);
 
-  const geometry = new THREE.SphereGeometry(30);
-  const material = new THREE.MeshStandardMaterial({
-    color: Color.WHITE,
-    transparent: true,
-    opacity: 0.5,
-  });
-  const mesh = new THREE.Mesh(geometry, material);
-  mesh.position.set(...targetPosition);
+  // addDirectionalLightTargetHelper(parent, targetPosition);
 
   parent.add(light);
   parent.add(light.target);
-  parent.add(mesh);
 
   scene.add(new THREE.DirectionalLightHelper(light, 50));
   return light;

@@ -4,6 +4,7 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import {containSize} from 'helpers/document-helpers';
 import {StateStorage} from 'helpers/state-storage';
 import {rotateObjectInDegrees} from '3d/helpers/object-helpers';
+import {getGUI} from '3d/helpers/gui-helpers';
 
 const ShadowsRequirement = {
   SCREEN_WIDTH: 1024,
@@ -28,9 +29,13 @@ export class Infrastructure {
     clearColor,
     onBeforeRender,
     onAfterRender,
+    withOrbit = false,
   }) {
+    this.withOrbit = withOrbit;
+
     this.container = container;
     this.canvas = canvas;
+    // TODO: size listener & get size
     const [width, height] = calculateRendererSize(container);
     this.renderer = createRenderer(canvas, width, height, clearColor);
     this.scene = createScene();
@@ -45,12 +50,23 @@ export class Infrastructure {
     this.scene.add(this.camera);
 
     setupCamera(this.camera, this.cameraConfig);
-    this.orbit = resetOrbit(this.orbit, this.canvas, this.camera);
+    this.orbit = resetOrbit(this.withOrbit, this.orbit, this.canvas, this.camera);
 
     this.shouldResize = false;
     window.addEventListener(`resize`, () => {
       this.shouldResize = true;
     });
+
+    const camera = this.camera;
+    getGUI().add({
+      get fov() {
+        return camera.fov;
+      },
+      set fov(fov) {
+        camera.fov = fov;
+        camera.updateProjectionMatrix();
+      },
+    }, `fov`, 1, 90, 1);
 
     this.onBeforeRender = onBeforeRender;
     this.onAfterRender = onAfterRender;
@@ -87,7 +103,7 @@ export class Infrastructure {
   resetCamera() {
     setupCamera(this.cameraMock, this.cameraConfig);
     setupCamera(this.camera, this.cameraConfig);
-    this.orbit = resetOrbit(this.orbit, this.canvas, this.camera);
+    this.orbit = resetOrbit(this.withOrbit, this.orbit, this.canvas, this.camera);
   }
 }
 
@@ -159,9 +175,12 @@ const resizeInfrastructure = (renderer, camera, width, height) => {
   renderer.setSize(width, height);
 };
 
-const resetOrbit = (orbit, canvas, camera) => {
+const resetOrbit = (withOrbit, orbit, canvas, camera) => {
   if (orbit) {
     orbit.dispose();
+  }
+  if (!withOrbit) {
+    return undefined;
   }
   orbit = new OrbitControls(camera, canvas);
   orbit.target.set(0, 0, 0);
