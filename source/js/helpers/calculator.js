@@ -126,7 +126,11 @@ export class NamedCalculator {
     this.xRange = xRange;
     this.yRange = yRange;
     this.onProgress = onProgress;
-    this.calculateY = createCalculator({xRange, yRange, onProgress});
+    this.updateCalculator();
+  }
+
+  updateCalculator() {
+    this.calculateY = createCalculator(this);
   }
 }
 

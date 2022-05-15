@@ -43,7 +43,7 @@ const addDirectionalLight = (scene, parent, {name, args, position, targetPositio
   light.position.set(...position);
   light.target.position.set(...targetPosition);
 
-  castShadow(light);
+  castLightShadow(light);
 
   const geometry = new THREE.SphereGeometry(30);
   const material = new THREE.MeshStandardMaterial({
@@ -67,7 +67,7 @@ const addPointLight = (scene, parent, {name, args, position}) => {
   light.name = name;
   light.position.set(...position);
 
-  castShadow(light);
+  castLightShadow(light);
 
   parent.add(light);
 
@@ -75,7 +75,7 @@ const addPointLight = (scene, parent, {name, args, position}) => {
   return light;
 };
 
-const castShadow = (light) => {
+const castLightShadow = (light) => {
   light.castShadow = true;
   light.shadow.mapSize.width = 512;
   light.shadow.mapSize.height = 512;

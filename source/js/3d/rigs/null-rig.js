@@ -7,7 +7,8 @@ export class NullRig {
   constructor(parent) {
     this._target = new THREE.Group();
     this._orbit = wrapObject(this._target);
-    this._root = wrapObject(this._orbit);
+    this._cursor = wrapObject(this._orbit);
+    this._root = wrapObject(this._cursor);
     parent.add(this._root);
 
     this._targetPosition = this._target.position.clone();
@@ -15,6 +16,10 @@ export class NullRig {
 
     this._orbitRotationY = 0;
     this._isOrbitRotationYChanged = true;
+
+    this._cursorRotationX = 0;
+    this._cursorRotationY = 0;
+    this._isCursorRotationChanged = false;
 
     this._targetLook = [0, 0, 0];
     this._isTargetLookChanged = true;
@@ -36,8 +41,16 @@ export class NullRig {
     return this._targetPosition.y;
   }
 
-  getOrbitRotation() {
+  getOrbitRotationY() {
     return this._orbitRotationY;
+  }
+
+  getCursorRotationX() {
+    return this._cursorRotationX;
+  }
+
+  getCursorRotationY() {
+    return this._cursorRotationY;
   }
 
   getLook() {
@@ -69,6 +82,22 @@ export class NullRig {
     }
   }
 
+  setCursorRotationX(rotation) {
+    if (rotation !== this._cursorRotationX) {
+      this._cursorRotationX = rotation;
+      this._isCursorRotationChanged = true;
+      this._isTargetLookChanged = !!this._targetLook;
+    }
+  }
+
+  setCursorRotationY(rotation) {
+    if (rotation !== this._cursorRotationY) {
+      this._cursorRotationY = rotation;
+      this._isCursorRotationChanged = true;
+      this._isTargetLookChanged = !!this._targetLook;
+    }
+  }
+
   setTargetLook(look) {
     if (!this._targetLook || this._targetLook.some((x, i) => x !== look[i])) {
       this._targetLook = look;
@@ -78,6 +107,13 @@ export class NullRig {
 
   invalidate() {
     let isRendered = false;
+
+    if (this._isCursorRotationChanged) {
+      this._cursor.rotation.y = this._cursorRotationX / RADIAN;
+      this._cursor.rotation.x = this._cursorRotationY / RADIAN;
+      this._isCursorRotationChanged = false;
+      isRendered = true;
+    }
 
     if (this._isOrbitRotationYChanged) {
       this._orbit.rotation.y = this._orbitRotationY / RADIAN;

@@ -45,7 +45,7 @@ const HISTORY_CAMERA = {
 
 const KEYHOLE_CAMERA = {
   position: [0, 0, 1000],
-  look: [0, 0, -4000],
+  look: [0, 0, Z_OFFSET],
 };
 
 const SCENE_KEY_TO_PARAMETER = {
@@ -261,6 +261,18 @@ export default async () => {
       const sceneIndex = SCENE_KEYS.indexOf(state.sceneKey) + (evt.shiftKey ? -1 : 1);
       setCurrentScene(getSceneKeyByIndex(sceneIndex), true);
     },
+  });
+
+  document.addEventListener(`mousemove`, (evt) => {
+    if (state.isPending) {
+      return;
+    }
+    const maxOffsetX = window.innerWidth / 2;
+    const maxOffsetY = window.innerHeight / 2;
+    state.cameraRig.setCursorRotationProgress([
+      (evt.clientX - maxOffsetX) / maxOffsetX,
+      (evt.clientY - maxOffsetY) / maxOffsetY,
+    ]);
   });
 
   run();

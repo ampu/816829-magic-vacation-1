@@ -6,6 +6,7 @@ import {easeInOut} from 'helpers/easings';
 const THRESHOLD_PROGRESS = 0.5;
 const PROGRESS_STEP = 0.001;
 const MAX_ROTATION = 360;
+const MAX_CURSOR_ROTATION = [5, 5];
 
 export const createKeyholeHistoryRig = ({
   parent,
@@ -15,6 +16,7 @@ export const createKeyholeHistoryRig = ({
   pointLights,
   radiusRange: [historyRadius, thresholdRadius, keyholeRadius],
   heightRange: [historyHeight, keyholeHeight],
+  maxCursorRotation: [maxCursorRotationX, maxCursorRotationY] = MAX_CURSOR_ROTATION,
   targetLookRange: [historyLook, keyholeLook],
 }) => {
   const nullRig = new NullRig(parent);
@@ -31,8 +33,21 @@ export const createKeyholeHistoryRig = ({
     {xRange: [0.5, 0.7], yRange: [0, 1]},
   ]);
 
+  const getCursorRotationX = createCalculator({yRange: [0, maxCursorRotationX]});
+  const getCursorRotationY = createCalculator({yRange: [0, maxCursorRotationY]});
+
+  const createAnimationCursorRotationCalculator = (currentCursorRotation) => {
+    return createRangesCalculator([
+      {xRange: [0, 0.5], yRange: [currentCursorRotation, 0]},
+      {xRange: [0.5, 1], yRange: [0, currentCursorRotation]},
+    ]);
+  };
+
+  let getAnimationCursorRotationX;
+  let getAnimationCursorRotationY;
+
   const createHistoryAnimation = (historySceneIndex, duration) => {
-    const startRotation = nullRig.getOrbitRotation();
+    const startRotation = nullRig.getOrbitRotationY();
     const endRotation = getOrbitRotationY(historySceneIndex);
 
     const smoothStartRotation = endRotation - startRotation > MAX_ROTATION / 2
@@ -64,6 +79,14 @@ export const createKeyholeHistoryRig = ({
       duration,
       onProgress: easeInOut,
       onRenderFrame({progress, regress}) {
+        if (progress === 0) {
+          getAnimationCursorRotationX = createAnimationCursorRotationCalculator(nullRig.getCursorRotationX());
+          getAnimationCursorRotationY = createAnimationCursorRotationCalculator(nullRig.getCursorRotationY());
+        }
+
+        nullRig.setCursorRotationX(getAnimationCursorRotationX(progress));
+        nullRig.setCursorRotationY(getAnimationCursorRotationY(progress));
+
         const t = isForward ? progress : regress;
         nullRig.setRadius(getRadius(t));
         nullRig.setHeight(getHeight(t));
@@ -95,6 +118,10 @@ export const createKeyholeHistoryRig = ({
     },
     setHeightProgress(progress) {
       nullRig.setHeight(getHeight(progress));
+    },
+    setCursorRotationProgress([xProgress, yProgress]) {
+      nullRig.setCursorRotationX(Math.sign(xProgress) * getCursorRotationX(Math.abs(xProgress)));
+      nullRig.setCursorRotationY(Math.sign(yProgress) * getCursorRotationY(Math.abs(yProgress)));
     },
     setTargetLookProgress(progress) {
       nullRig.setTargetLook(getTargetLook(progress));
