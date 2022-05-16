@@ -57,16 +57,16 @@ export class Infrastructure {
       this.shouldResize = true;
     });
 
-    const camera = this.camera;
-    getGUI().add({
-      get fov() {
-        return camera.fov;
-      },
-      set fov(fov) {
-        camera.fov = fov;
-        camera.updateProjectionMatrix();
-      },
-    }, `fov`, 1, 90, 1);
+    // const camera = this.camera;
+    // getGUI().add({
+    //   get fov() {
+    //     return camera.fov;
+    //   },
+    //   set fov(fov) {
+    //     camera.fov = fov;
+    //     camera.updateProjectionMatrix();
+    //   },
+    // }, `fov`, 1, 90, 1);
 
     this.onBeforeRender = onBeforeRender;
     this.onAfterRender = onAfterRender;

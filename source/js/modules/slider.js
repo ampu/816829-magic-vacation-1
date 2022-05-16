@@ -15,12 +15,11 @@ export const SLIDES = [
     textureUrl: `./img/scenes-textures/scene-1.png`,
   },
   {
-    isCustom: true,
+    withBubbles: true,
     image: `url("img/slide2.jpg")`,
     gradient: `linear-gradient(180deg, rgba(45, 54, 179, 0) 0%, #2a34b0 16.85%)`,
     themeColor: `#5468ff`,
     textureUrl: `./img/scenes-textures/scene-2.png`,
-    hueRotation: [0, -20],
   },
   {
     image: `url("img/slide3.jpg")`,
@@ -124,7 +123,7 @@ export default () => {
     dispatchSlideChangeEvent(slide);
   };
 
-  renderSlide(SLIDES[0]);
+  renderSlide(SLIDES[1]);
 
   window.addEventListener(`resize`, renderSlider);
   renderSlider();
